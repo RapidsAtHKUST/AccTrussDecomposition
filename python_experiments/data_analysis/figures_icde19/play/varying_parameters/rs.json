@@ -1,0 +1,74 @@
+{
+    "1": {
+        "Tri time": 3.501,
+        "Sync Time": 1.504,
+        "Shrink Time": 1.248,
+        "Scan Time": 109.257,
+        "Proc Time": 65.276,
+        "Total computation cost": 180.864
+    },
+    "2": {
+        "Tri time": 3.498,
+        "Sync Time": 1.205,
+        "Shrink Time": 1.165,
+        "Scan Time": 55.75,
+        "Proc Time": 64.937,
+        "Total computation cost": 126.642
+    },
+    "4": {
+        "Tri time": 3.433,
+        "Sync Time": 1.068,
+        "Shrink Time": 1.174,
+        "Scan Time": 28.31,
+        "Proc Time": 65.224,
+        "Total computation cost": 99.283
+    },
+    "8": {
+        "Tri time": 3.482,
+        "Sync Time": 1.004,
+        "Shrink Time": 1.18,
+        "Scan Time": 15.803,
+        "Proc Time": 64.722,
+        "Total computation cost": 86.263
+    },
+    "16": {
+        "Tri time": 3.469,
+        "Sync Time": 0.95,
+        "Shrink Time": 1.122,
+        "Scan Time": 9.352,
+        "Proc Time": 64.589,
+        "Total computation cost": 79.566
+    },
+    "32": {
+        "Tri time": 3.469,
+        "Sync Time": 0.953,
+        "Shrink Time": 1.088,
+        "Scan Time": 6.218,
+        "Proc Time": 65.656,
+        "Total computation cost": 77.459
+    },
+    "64": {
+        "Tri time": 3.443,
+        "Sync Time": 0.963,
+        "Shrink Time": 1.054,
+        "Scan Time": 5.048,
+        "Proc Time": 65.638,
+        "Total computation cost": 76.217
+    },
+    "128": {
+        "Tri time": 3.469,
+        "Sync Time": 0.944,
+        "Shrink Time": 1.114,
+        "Scan Time": 5.35,
+        "Proc Time": 67.066,
+        "Total computation cost": 78.035
+    },
+    "256": {
+        "Tri time": 3.465,
+        "Sync Time": 1.172,
+        "Shrink Time": 1.224,
+        "Scan Time": 10.572,
+        "Proc Time": 71.086,
+        "Total computation cost": 87.59
+    }
+}

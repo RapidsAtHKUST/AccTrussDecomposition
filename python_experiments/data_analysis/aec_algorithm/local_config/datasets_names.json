@@ -1,0 +1,21 @@
+{
+  "snap_livejournal": "LJ",
+  "snap_orkut": "OR",
+  "webgraph_eu": "WE",
+  "webgraph_uk": "WU",
+  "webgraph_webbase": "WB",
+  "webgraph_it": "WI",
+  "webgraph_twitter": "TW",
+  "snap_friendster": "FR",
+  "rmat_v50m_e0.5g": "RMAT-0.5G-d20",
+  "rmat_v5m_e0.5g": "RMAT-0.5G-d200",
+  "rmat_v0.5m_e0.5g": "RMAT-0.5G-d2000",
+  "s22-16": "s22-16",
+  "s23-16": "s23-16",
+  "s24-16": "s24-16",
+  "s25-16": "s25-16",
+  "ssca-s17-c2k": "ssca-s17-c2k",
+  "ssca-s17-c4k": "ssca-s17-c4k",
+  "ssca-s17-c6k": "ssca-s17-c6k",
+  "ssca-s17-c8k": "ssca-s17-c8k"
+}

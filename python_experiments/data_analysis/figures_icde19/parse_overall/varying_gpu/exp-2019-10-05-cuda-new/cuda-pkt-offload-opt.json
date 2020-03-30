@@ -1,0 +1,242 @@
+{
+    "webgraph_eu": {
+        "GPU": {
+            "End-To-End Time": 1.896005759,
+            "Finish BSR construction": 0.109301736,
+            "Finish Support Initialization": 0.657606652,
+            "Parallel K-Truss": 25.038228172,
+            "Offloading Comp Time": 21.619839718,
+            "Prepare CPU time": 1.7528
+        },
+        "CUDA": {
+            "PKT_CUDA kernel time": 16.0204,
+            "Prepare CPU time": 1.7528,
+            "Scan CPU time": 3.9202,
+            "Shrink CPU time": 1.1548,
+            "Copy CPU time": 0.6497,
+            "Sub process CPU time": 13.4769,
+            "Set Intersection time": 11.5769,
+            "Update processed time": 0.6319
+        },
+        "CPU": {
+            "Tri time": 1.896,
+            "Sync Time": 0.019,
+            "Shrink Time": 0.0,
+            "Scan Time": 0.0,
+            "Proc Time": 0.0,
+            "Total computation cost": 2.64
+        },
+        "Summary": {
+            "Parallel K-Truss": 25.038228172,
+            "OFF-TC": 0.766908388,
+            "OFF-TC-Transferring": 1.1290973709999998,
+            "Prepare CPU time": 1.7528,
+            "OFF-RIEP-CPU": 0.019,
+            "OFF-RIEP-GPU": 19.867039718,
+            "OFF-IEP-Total": 19.886039718,
+            "OFF-TC_IEP-Total": 20.652948106,
+            "Total-Overheads": 4.385280066,
+            "Other-Overheads": 1.5033826950000004
+        }
+    },
+    "webgraph_it": {
+        "GPU": {
+            "End-To-End Time": 5.138770113,
+            "Finish BSR construction": 0.869440766,
+            "Finish Support Initialization": 1.275788754,
+            "Parallel K-Truss": 67.722658336,
+            "Offloading Comp Time": 16.697679621,
+            "Prepare CPU time": 2.1025
+        },
+        "CUDA": {
+            "PKT_CUDA kernel time": 10.6714,
+            "Prepare CPU time": 2.1025,
+            "Scan CPU time": 1.9375,
+            "Shrink CPU time": 1.7514,
+            "Copy CPU time": 0.4448,
+            "Sub process CPU time": 9.4038,
+            "Set Intersection time": 7.0369,
+            "Update processed time": 0.4357
+        },
+        "CPU": {
+            "Tri time": 5.139,
+            "Sync Time": 0.053,
+            "Shrink Time": 5.371,
+            "Scan Time": 3.255,
+            "Proc Time": 34.732,
+            "Total computation cost": 49.353
+        },
+        "Summary": {
+            "Parallel K-Truss": 67.722658336,
+            "OFF-TC": 2.14522952,
+            "OFF-TC-Transferring": 2.9935405929999996,
+            "Prepare CPU time": 2.1025,
+            "OFF-RIEP-CPU": 43.411,
+            "OFF-RIEP-GPU": 14.595179621,
+            "OFF-IEP-Total": 58.006179621,
+            "OFF-TC_IEP-Total": 60.151409141,
+            "Total-Overheads": 7.571249194999993,
+            "Other-Overheads": 2.4752086019999933
+        }
+    },
+    "webgraph_twitter": {
+        "GPU": {
+            "End-To-End Time": 10.747437624,
+            "Finish BSR construction": 0.300450555,
+            "Finish Support Initialization": 7.132139232,
+            "Parallel K-Truss": 107.633256557,
+            "Offloading Comp Time": 52.981497382,
+            "Prepare CPU time": 1.7375
+        },
+        "CUDA": {
+            "PKT_CUDA kernel time": 42.5166,
+            "Prepare CPU time": 1.7375,
+            "Scan CPU time": 6.1551,
+            "Shrink CPU time": 3.0728,
+            "Copy CPU time": 1.8735,
+            "Sub process CPU time": 38.879,
+            "Set Intersection time": 34.5504,
+            "Update processed time": 1.9578
+        },
+        "CPU": {
+            "Tri time": 10.748,
+            "Sync Time": 0.049,
+            "Shrink Time": 6.711,
+            "Scan Time": 4.485,
+            "Proc Time": 28.847,
+            "Total computation cost": 52.818
+        },
+        "Summary": {
+            "Parallel K-Truss": 107.633256557,
+            "OFF-TC": 7.432589787,
+            "OFF-TC-Transferring": 3.3148478369999994,
+            "Prepare CPU time": 1.7375,
+            "OFF-RIEP-CPU": 40.092,
+            "OFF-RIEP-GPU": 51.243997382,
+            "OFF-IEP-Total": 91.335997382,
+            "OFF-TC_IEP-Total": 98.768587169,
+            "Total-Overheads": 8.864669387999996,
+            "Other-Overheads": 3.8123215509999966
+        }
+    },
+    "snap_orkut": {
+        "GPU": {
+            "End-To-End Time": 0.946141732,
+            "Finish BSR construction": 0.010887364,
+            "Finish Support Initialization": 0.46132948,
+            "Parallel K-Truss": 7.490990245,
+            "Offloading Comp Time": 5.603439943,
+            "Prepare CPU time": 0.7807
+        },
+        "CUDA": {
+            "PKT_CUDA kernel time": 3.7308,
+            "Prepare CPU time": 0.7807,
+            "Scan CPU time": 0.3321,
+            "Shrink CPU time": 0.3879,
+            "Copy CPU time": 0.232,
+            "Sub process CPU time": 3.6333,
+            "Set Intersection time": 3.1069,
+            "Update processed time": 0.2683
+        },
+        "CPU": {
+            "Tri time": 0.946,
+            "Sync Time": 0.037,
+            "Shrink Time": 0.0,
+            "Scan Time": 0.0,
+            "Proc Time": 0.0,
+            "Total computation cost": 1.321
+        },
+        "Summary": {
+            "Parallel K-Truss": 7.490990245,
+            "OFF-TC": 0.472216844,
+            "OFF-TC-Transferring": 0.47392488799999993,
+            "Prepare CPU time": 0.7807,
+            "OFF-RIEP-CPU": 0.037,
+            "OFF-RIEP-GPU": 4.822739943,
+            "OFF-IEP-Total": 4.859739943,
+            "OFF-TC_IEP-Total": 5.331956787,
+            "Total-Overheads": 2.1590334579999997,
+            "Other-Overheads": 0.9044085699999997
+        }
+    },
+    "webgraph_uk": {
+        "GPU": {
+            "End-To-End Time": 1.21764532,
+            "Finish BSR construction": 0.076475896,
+            "Finish Support Initialization": 0.450411331,
+            "Parallel K-Truss": 8.00894992,
+            "Offloading Comp Time": 5.500074483,
+            "Prepare CPU time": 1.0966
+        },
+        "CUDA": {
+            "PKT_CUDA kernel time": 2.8077,
+            "Prepare CPU time": 1.0966,
+            "Scan CPU time": 0.4866,
+            "Shrink CPU time": 0.838,
+            "Copy CPU time": 0.1768,
+            "Sub process CPU time": 2.6191,
+            "Set Intersection time": 2.0051,
+            "Update processed time": 0.1739
+        },
+        "CPU": {
+            "Tri time": 1.218,
+            "Sync Time": 0.043,
+            "Shrink Time": 0.0,
+            "Scan Time": 0.0,
+            "Proc Time": 0.0,
+            "Total computation cost": 1.625
+        },
+        "Summary": {
+            "Parallel K-Truss": 8.00894992,
+            "OFF-TC": 0.526887227,
+            "OFF-TC-Transferring": 0.6907580929999999,
+            "Prepare CPU time": 1.0966,
+            "OFF-RIEP-CPU": 0.043,
+            "OFF-RIEP-GPU": 4.403474483,
+            "OFF-IEP-Total": 4.446474483,
+            "OFF-TC_IEP-Total": 4.973361710000001,
+            "Total-Overheads": 3.0355882099999985,
+            "Other-Overheads": 1.2482301169999985
+        }
+    },
+    "webgraph_webbase": {
+        "GPU": {
+            "End-To-End Time": 6.330182787,
+            "Finish BSR construction": 0.33913378,
+            "Finish Support Initialization": 2.566037665,
+            "Parallel K-Truss": 40.72751233,
+            "Offloading Comp Time": 13.550549419,
+            "Prepare CPU time": 2.2618
+        },
+        "CUDA": {
+            "PKT_CUDA kernel time": 6.41,
+            "Prepare CPU time": 2.2618,
+            "Scan CPU time": 0.9823,
+            "Shrink CPU time": 3.1625,
+            "Copy CPU time": 0.5072,
+            "Sub process CPU time": 5.5298,
+            "Set Intersection time": 3.4955,
+            "Update processed time": 0.232
+        },
+        "CPU": {
+            "Tri time": 6.33,
+            "Sync Time": 0.041,
+            "Shrink Time": 1.78,
+            "Scan Time": 2.552,
+            "Proc Time": 12.642,
+            "Total computation cost": 24.224
+        },
+        "Summary": {
+            "Parallel K-Truss": 40.72751233,
+            "OFF-TC": 2.905171445,
+            "OFF-TC-Transferring": 3.425011342,
+            "Prepare CPU time": 2.2618,
+            "OFF-RIEP-CPU": 17.015,
+            "OFF-RIEP-GPU": 11.288749418999998,
+            "OFF-IEP-Total": 28.303749419,
+            "OFF-TC_IEP-Total": 31.208920864,
+            "Total-Overheads": 9.518591466000004,
+            "Other-Overheads": 3.831780124000004
+        }
+    }
+}

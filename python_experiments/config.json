@@ -1,0 +1,398 @@
+{
+  "gpu24": {
+    "k_truss_exec_path": "/home/yche/build-pkt",
+    "graph_stat_exec_tag": "/home/yche/yche-bin",
+    "data_set_path": "/mnt/nvme-ssd/yche/datasets",
+    "bak2": "/mnt/storage1/yche/datasets",
+    "necleus_decomp_exec_path": "/home/yche/build-necleus",
+    "exp_res_root_path": "/mnt/storage1/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "exp_res_root_mount_path": "/home/yche/mnt/luocpu9/mnt/storage1/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "thread_num": 64,
+    "thread num lst": [
+      64
+    ],
+    "bak": [
+      "snap_livejournal",
+      "snap_orkut",
+      "webgraph_uk",
+      "webgraph_webbase",
+      "s22-16",
+      "s23-16",
+      "s24-16",
+      "webgraph_uk",
+      "webgraph_webbase",
+      "webgraph_it",
+      "webgraph_twitter",
+      "webgraph_eu",
+      "snap_livejournal",
+      "snap_orkut"
+    ],
+    "data_set_lst": [
+      "s19-16",
+      "s20-16",
+      "s21-16"
+    ]
+  },
+  "hnode-79": {
+    "exp_res_root_mount_path": "/home/yche/mnt/hpc2/gitrepos/OutOfCoreSCAN/python_experiments/exp_results",
+    "k_truss_exec_path": "/home/yche/build-pkt",
+    "data_set_path": "/home/yche/datasets/datasets",
+    "exp_res_root_path": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "thread num lst": [
+      1,
+      6,
+      12,
+      24
+    ],
+    "data_set_lst": [
+      "snap_livejournal",
+      "snap_orkut",
+      "webgraph_eu",
+      "webgraph_uk",
+      "webgraph_webbase",
+      "webgraph_it",
+      "webgraph_twitter",
+      "snap_friendster",
+      "rmat_v50m_e0.5g",
+      "rmat_v5m_e0.5g",
+      "rmat_v0.5m_e0.5g"
+    ]
+  },
+  "ustgpu2": {
+    "exp_res_root_mount_path": "/home/yche/mnt/ustgpu2/workspace/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "k_truss_exec_path": "/home/zlai/build-pkt",
+    "karypis_k_truss_exec_path": "/home/zlai/build-msp",
+    "necleus_decomp_exec_path": "/home/zlai/build-hidx",
+    "data_set_path": "/ssd/zlai/yche-datasets/datasets",
+    "exp_res_root_path": "/home/zlai/workspace/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "thread num lst": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      40,
+      64
+    ],
+    "data_set_lst": [
+      "snap_orkut",
+      "webgraph_eu",
+      "webgraph_uk",
+      "webgraph_webbase",
+      "webgraph_it",
+      "webgraph_twitter"
+    ]
+  },
+  "ustgpu1": {
+    "exp_res_root_mount_path": "/home/yche/mnt/ustgpu1/workspace/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "k_truss_exec_path": "/home/zlai/build-pkt",
+    "karypis_k_truss_exec_path": "/home/zlai/build-msp",
+    "necleus_decomp_exec_path": "/home/zlai/build-hidx",
+    "data_set_path": "/ssd/zlai/yche-datasets/datasets",
+    "exp_res_root_path": "/home/zlai/workspace/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "bak": [
+      1,
+      14,
+      28
+    ],
+    "thread num lst": [
+      56
+    ],
+    "data_set_lst": [
+      "snap_livejournal",
+      "snap_orkut",
+      "webgraph_uk",
+      "webgraph_eu",
+      "webgraph_webbase",
+      "webgraph_it",
+      "webgraph_twitter"
+    ]
+  },
+  "gpu-other": {
+    "our_exec_path_bak": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/scan-query/build-gpu-other",
+    "k_truss_exec_path": "/home/yche/build-pkt",
+    "necleus_decomp_exec_path": "/home/yche/build-necleus-decomp",
+    "our_exec_path": "/home/yche/build",
+    "data_set_path": "/mnt/storage1/yche/datasets",
+    "karypis_k_truss_exec_path": "/home/yche/build-truss-karypis",
+    "thread_num": 40,
+    "thread num lst": [
+      1,
+      10,
+      20,
+      40
+    ],
+    "exp_res_root_path": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "exp_res_root_mount_path": "/home/yche/mnt/luocpu9/mnt/storage1/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "han_order_exec_path": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/graph-reordering/build-other/reorder",
+    "weihao_order_exec_path": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/graph-reordering/build-other/reordering/other-reorderings/gorder_cache",
+    "reordering_to_ppscan_input_exec_path": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/graph-reordering/build-other/converter/reordering_pscan_input",
+    "ppSCAN_exec_path": "/mnt/nfsshare/yche/git-repos/ppSCAN/ppSCAN-release/build-other/pSCANParallelSSE",
+    "exec_lst": [
+      "scan-xp-compact-forward-deg"
+    ],
+    "data_set_lst": [
+      "snap_livejournal",
+      "snap_orkut",
+      "webgraph_eu",
+      "webgraph_uk",
+      "webgraph_webbase",
+      "webgraph_it",
+      "webgraph_twitter",
+      "snap_friendster",
+      "rmat_v50m_e0.5g",
+      "rmat_v5m_e0.5g",
+      "rmat_v0.5m_e0.5g"
+    ],
+    "data_set_lst2": [
+      "webgraph_twitter",
+      "snap_friendster"
+    ]
+  },
+  "gpu23": {
+    "k_truss_exec_path": "/home/yche/build-pkt",
+    "our_exec_path_bak": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/scan-query/build-gpu23",
+    "our_exec_path": "/home/yche/build23",
+    "data_set_path": "/mnt/storage1/yche/datasets",
+    "exp_res_root_path": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "ppSCAN_input_to_edge_lst_unidr_exec_path": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/graph-reordering/build/converter/pscan_input_to_edge_list",
+    "ppSCAN_input_to_edge_lst_unidr_verification_path": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/graph-reordering/build/converter/edge_list_head",
+    "exp_res_root_mount_path": "/home/yche/mnt/luocpu9/mnt/storage1/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "ppSCAN_exec_path": "/mnt/nfsshare/yche/git-repos/ppSCAN/ppSCAN-release/build/pSCANParallelAVX2",
+    "han_order_exec_path": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/graph-reordering/build/reordering",
+    "weihao_order_exec_path": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/graph-reordering/build-test/reordering/other-reorderings/gorder_cache",
+    "reordering_to_ppscan_input_exec_path": "/mnt/nfsshare/yche/git-repos/OutOfCoreSCAN/graph-reordering/build/converter/reordering_pscan_input",
+    "thread_num": 40,
+    "tri_cnt_exec_lst": [
+      "tri-cnt-naive-merge",
+      "tri-cnt-avx2-asm-tetzank",
+      "tri-cnt-avx2-bmerge",
+      "tri-cnt-avx2-lemire",
+      "tri-cnt-naive-hybrid",
+      "tri-cnt-avx2-hybrid",
+      "tri-cnt-sse-han-bmiss-sttni",
+      "tri-cnt-sse-han-qfilter",
+      "tri-cnt-sse-eh-uint",
+      "tri-cnt-sse-eh-hybrid",
+      "tri-cnt-sse-bsr-qfilter",
+      "tri-cnt-naive-bsr-scalar-merge",
+      "tri-cnt-avx2-roaring",
+      "tri-cnt-naive-bitvec",
+      "tri-cnt-naive-bitvec-2d",
+      "tri-cnt-naive-bitvec-adv",
+      "tri-cnt-naive-bitvec-op"
+    ],
+    "thread num lst": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      40,
+      64
+    ],
+    "exec_lst": [
+      "scan-xp-compact-forward-bmp"
+    ],
+    "synthetic_exec_lst": [
+      "scan-xp-avx2-merge-synthetic",
+      "scan-xp-avx2-galloping-single-synthetic",
+      "scan-xp-avx2-hybrid-synthetic",
+      "scan-xp-naive-bitvec-2d-synthetic",
+      "scan-xp-naive-bitvec-synthetic"
+    ],
+    "data_set_lst": [
+      "snap_livejournal",
+      "snap_orkut",
+      "webgraph_uk",
+      "webgraph_eu",
+      "webgraph_webbase",
+      "webgraph_it",
+      "webgraph_twitter"
+    ]
+  },
+  "lccpu12": {
+    "k_truss_exec_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/scan-query-root/truss-decomp/build",
+    "karypis_k_truss_exec_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/OutOfCoreSCAN/2017-hepc-K-Truss/build",
+    "edge_lst_to_csr_exec_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/scan-query-root/graph-reordering/build/converter",
+    "our_exec_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/scan-query-root/scan-query/build",
+    "our_exec_cuda_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/scan-query-root/scan-query-cuda/build",
+    "necleus_decomp_exec_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/OutOfCoreSCAN/necleus-decomp/build",
+    "data_set_path": "/export/data/set-inter-datasets/data/dataset",
+    "exp_res_root_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/scan-query-root/python_experiments/exp_results",
+    "exp_res_root_mount_path": "/home/yche/mnt/wangyue-clu/csproject/biggraph/ywangby/yche/new-git-repos-yche/scan-query-root/python_experiments/exp_results",
+    "ppSCAN_exec_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/ppSCAN/ppSCAN-release/build/pSCANParallelAVX2",
+    "ppSCAN_input_to_edge_lst_unidr_exec_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/scan-query-root/graph-reordering/build/converter/pscan_input_to_edge_list",
+    "ppSCAN_input_to_edge_lst_unidr_verification_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/scan-query-root/graph-reordering/build/converter/edge_list_head",
+    "reordering_to_ppscan_input_exec_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/scan-query-root/graph-reordering/build/converter/reordering_pscan_input",
+    "han_order_exec_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/scan-query-root/graph-reordering/build/reorder",
+    "weihao_order_exec_path": "/homes/ywangby/workspace/yche/new-git-repos-yche/scan-query-root/graph-reordering/build-test/reordering/other-reorderings/gorder_cache",
+    "thread_num": 56,
+    "thread num lst": [
+      32,
+      36,
+      40,
+      44,
+      48,
+      52,
+      56,
+      1
+    ],
+    "bak": [
+    ],
+    "to_csr_exec_lst": [
+      "edge_list_to_csr_performance_measure",
+      "edge_list_to_csr_performance_measure_deg_descending"
+    ],
+    "hash_exec_lst": [
+      "scan-xp-naive-hash",
+      "scan-xp-naive-hash-spp",
+      "scan-xp-naive-bitvec"
+    ],
+    "exec_lst": [
+      "scan-xp-sse-emptyheaded-layout-hybrid",
+      "scan-xp-sse-emptyheaded-layout-uint",
+      "scan-xp-tetzank-avx",
+      "scan-xp-tetzank-avx2",
+      "scan-xp-tetzank-avx2-asm",
+      "scan-xp-avx2-lemire",
+      "scan-xp-sse-lemire",
+      "scan-xp-sse-bm-lemire",
+      "scan-xp-avx2-roaring",
+      "scan-xp-sse-roaring",
+      "scan-xp-sse-han-bsr-scalar-merge",
+      "scan-xp-sse-han-bsr-scalar-galloping",
+      "scan-xp-sse-han-bsr-sse-galloping",
+      "scan-xp-sse-han-bsr-sse-shuffle",
+      "scan-xp-sse-han-bsr-qfilter",
+      "scan-xp-sse-han-bmiss-sttni",
+      "scan-xp-sse-han-bmiss",
+      "scan-xp-sse-han-qfilter",
+      "scan-xp-avx2-galloping-single",
+      "scan-xp-avx2-hybrid",
+      "scan-xp-avx2-merge",
+      "scan-xp-naive-bitvec",
+      "scan-xp-naive-bitvec-2d"
+    ],
+    "exec_lst2": [
+    ],
+    "synthetic_exec_lst": [
+      "scan-xp-avx2-merge-synthetic",
+      "scan-xp-avx2-galloping-single-synthetic",
+      "scan-xp-avx2-hybrid-synthetic",
+      "scan-xp-naive-bitvec-2d-synthetic",
+      "scan-xp-naive-bitvec-synthetic"
+    ],
+    "data_set_lst2": [
+      "webgraph_twitter",
+      "snap_friendster",
+      "rmat_v50m_e0.5g",
+      "rmat_v5m_e0.5g",
+      "rmat_v0.5m_e0.5g",
+      "rmat_v100m_e1g",
+      "rmat_v10m_e1g",
+      "rmat_v1m_e1g",
+      "rmat_v200m_e2g",
+      "rmat_v20m_e2g",
+      "rmat_v2m_e2g"
+    ],
+    "data_set_lst": [
+      "snap_livejournal",
+      "snap_orkut",
+      "webgraph_twitter",
+      "snap_friendster",
+      "webgraph_eu",
+      "webgraph_uk",
+      "webgraph_webbase",
+      "webgraph_it",
+      "rmat_v50m_e0.5g",
+      "rmat_v5m_e0.5g",
+      "rmat_v0.5m_e0.5g"
+    ]
+  },
+  "knl": {
+    "k_truss_exec_path": "/home/yche/build-pkt",
+    "edge_lst_to_csr_exec_path": "/nfsshare-slave2/share/scan-query-root/graph-reordering/build/converter",
+    "our_exec_path": "/nfsshare-slave2/share/scan-query-root/scan-query/build",
+    "our_exec_non_hbw_path": "/nfsshare-slave2/share/scan-query-root/scan-query/build-non-hbw",
+    "data_set_path": "/home/yche/data/dataset",
+    "exp_res_root_path": "/nfsshare-slave2/share/scan-query-root/python_experiments/exp_results",
+    "exp_res_root_mount_path": "/home/yche/mnt/luocpu9/mnt/storage1/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "ppSCAN_exec_path": "/nfsshare-slave2/share/scan-query-root/ppSCAN/build/pSCANParallelAVX512",
+    "ppSCAN_input_to_edge_lst_unidr_exec_path": "/nfsshare-slave2/share/scan-query-root/graph-reordering/build/converter/pscan_input_to_edge_list",
+    "ppSCAN_input_to_edge_lst_unidr_verification_path": "/nfsshare-slave2/share/scan-query-root/graph-reordering/build/converter/edge_list_head",
+    "rabbit_order_exec_path": "/nfsshare-slave2/share/scan-query-root/graph-reordering/build/reordering/other-reorderings/rabbit_order",
+    "reordering_to_ppscan_input_exec_path": "/nfsshare-slave2/share/scan-query-root/graph-reordering/build/converter/reordering_pscan_input",
+    "han_order_exec_path": "/nfsshare-slave2/share/scan-query-root/graph-reordering/build/reorder",
+    "weihao_order_exec_path": "/nfsshare-slave2/share/scan-query-root/graph-reordering/build-test/reordering/other-reorderings/gorder_cache",
+    "to_csr_exec_lst": [
+      "edge_list_to_csr_performance_measure",
+      "edge_list_to_csr_performance_measure_hbw",
+      "edge_list_to_csr_performance_measure_deg_descending",
+      "edge_list_to_csr_performance_measure_deg_descending_hbw"
+    ],
+    "hash_exec_lst": [
+      "scan-xp-naive-hash",
+      "scan-xp-naive-hash-spp",
+      "scan-xp-naive-bitvec",
+      "scan-xp-naive-bitvec-hbw"
+    ],
+    "exec_lst": [
+      "scan-xp-sse-emptyheaded-layout-hybrid",
+      "scan-xp-sse-emptyheaded-layout-uint",
+      "scan-xp-tetzank-avx",
+      "scan-xp-tetzank-avx2",
+      "scan-xp-tetzank-avx2-asm",
+      "scan-xp-avx2-lemire",
+      "scan-xp-sse-lemire",
+      "scan-xp-sse-bm-lemire",
+      "scan-xp-avx2-roaring",
+      "scan-xp-sse-roaring",
+      "scan-xp-sse-han-bsr-scalar-merge",
+      "scan-xp-sse-han-bsr-scalar-galloping",
+      "scan-xp-sse-han-bsr-sse-galloping",
+      "scan-xp-sse-han-bsr-sse-shuffle",
+      "scan-xp-sse-han-bsr-qfilter",
+      "scan-xp-sse-han-bmiss-sttni",
+      "scan-xp-sse-han-bmiss",
+      "scan-xp-sse-han-qfilter",
+      "scan-xp-avx2-galloping-single",
+      "scan-xp-avx2-hybrid",
+      "scan-xp-avx2-merge",
+      "scan-xp-naive-bitvec",
+      "scan-xp-naive-bitvec-2d"
+    ],
+    "exec_lst2": [
+    ],
+    "synthetic_exec_lst": [
+      "scan-xp-avx512-merge-synthetic",
+      "scan-xp-avx512-galloping-single-synthetic",
+      "scan-xp-avx2-hybrid-synthetic",
+      "scan-xp-naive-bitvec-hbw-2d-synthetic",
+      "scan-xp-naive-bitvec-hbw-synthetic"
+    ],
+    "thread num lst": [
+      128,
+      64,
+      32
+    ],
+    "thread_num": 256,
+    "data_set_lst2": [
+      "webgraph_it",
+      "webgraph_twitter",
+      "snap_friendster"
+    ],
+    "data_set_lst": [
+      "snap_livejournal",
+      "snap_orkut",
+      "webgraph_twitter",
+      "snap_friendster",
+      "webgraph_eu",
+      "webgraph_uk",
+      "webgraph_webbase",
+      "webgraph_it"
+    ]
+  }
+}

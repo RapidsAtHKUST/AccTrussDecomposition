@@ -1,0 +1,50 @@
+{
+    "snap_orkut": {
+        "Tri time": 3.531,
+        "Sync Time": 0.041,
+        "Shrink Time": 1.648,
+        "Scan Time": 0.486,
+        "Proc Time": 9.233,
+        "Total computation cost": 14.953
+    },
+    "webgraph_uk": {
+        "Tri time": 0.943,
+        "Sync Time": 0.116,
+        "Shrink Time": 0.87,
+        "Scan Time": 1.04,
+        "Proc Time": 11.421,
+        "Total computation cost": 14.406
+    },
+    "webgraph_webbase": {
+        "Tri time": 2.886,
+        "Sync Time": 0.344,
+        "Shrink Time": 2.177,
+        "Scan Time": 4.265,
+        "Proc Time": 33.296,
+        "Total computation cost": 42.992
+    },
+    "webgraph_eu": {
+        "Tri time": 3.468,
+        "Sync Time": 2.577,
+        "Shrink Time": 1.119,
+        "Scan Time": 98.193,
+        "Proc Time": 69.754,
+        "Total computation cost": 175.192
+    },
+    "webgraph_it": {
+        "Tri time": 4.365,
+        "Sync Time": 0.824,
+        "Shrink Time": 5.816,
+        "Scan Time": 11.957,
+        "Proc Time": 76.215,
+        "Total computation cost": 99.232
+    },
+    "webgraph_twitter": {
+        "Tri time": 61.761,
+        "Sync Time": 0.267,
+        "Shrink Time": 11.216,
+        "Scan Time": 10.346,
+        "Proc Time": 179.975,
+        "Total computation cost": 263.733
+    }
+}

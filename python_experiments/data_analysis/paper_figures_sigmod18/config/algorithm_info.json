@@ -1,0 +1,16 @@
+{
+  "algorithm_abbr": {
+    "scan-xp-baseline-avx512-merge": "KNL-SCANXP",
+    "scan-xp-avx512-merge": "KNL-BlockMerge",
+    "scan-xp-avx512-galloping-single": "KNL-PivotSkip",
+    "scan-xp-avx512-hybrid": "KNL-Hybrid",
+    "scan-xp-naive-bitvec-hbw-2d": "KNL-Bitmap",
+    "scan-xp-avx2-merge": "CPU-BlockMerge",
+    "scan-xp-avx2-galloping-single": "CPU-PivotSkip",
+    "scan-xp-avx2-hybrid": "CPU-Hybrid",
+    "scan-xp-naive-bitvec-2d": "CPU-Bitmap",
+    "scan-xp-cuda-4-8-multi-gpu-multi-pass-dynamic-lb": "mGPU-HybridWarp",
+    "scan-xp-cuda-hybrid-kernels-multi-gpu-multi-pass-dynamic-lb": "mGPU-HybridKernel",
+    "scan-xp-cuda-bitmap-warp-per-vertex-multi-gpu-multi-pass-dynamic-lb": "mGPU-Bitmap"
+  }
+}

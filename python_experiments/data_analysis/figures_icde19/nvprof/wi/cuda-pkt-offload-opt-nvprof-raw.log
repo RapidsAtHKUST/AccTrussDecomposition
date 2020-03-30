@@ -1,0 +1,13 @@
+==384117== Unified Memory profiling result:
+Device "Tesla V100-PCIE-16GB (0)"
+   Count  Avg Size  Min Size  Max Size  Total Size  Total Time  Name
+  118478  25.267KB  4.0000KB  0.9961MB  2.854870GB  513.7435ms  Host To Device
+   30575  327.56KB  4.0000KB  2.0000MB  9.551109GB  842.3754ms  Device To Host
+   19539         -         -         -           -   1.443177s  Gpu page fault groups
+     425         -         -         -           -  182.6644ms  Page throttles
+    1343  4.0000KB  4.0000KB  4.0000KB  5.246094MB           -  Memory thrashes
+      85  4.0000KB  4.0000KB  4.0000KB  340.0000KB           -  Remote mapping from device
+Total CPU Page faults: 22898
+Total CPU thrashes: 1343
+Total CPU throttles: 425
+Total remote mappings to CPU: 85

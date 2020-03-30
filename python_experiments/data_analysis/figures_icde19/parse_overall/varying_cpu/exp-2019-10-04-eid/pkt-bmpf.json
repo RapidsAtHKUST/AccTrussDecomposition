@@ -1,0 +1,26 @@
+{
+    "webgraph_eu": {
+        "Tri time": 3.455,
+        "Sync Time": 2.586,
+        "Shrink Time": 1.234,
+        "Scan Time": 98.467,
+        "Proc Time": 69.22,
+        "Total computation cost": 175.044
+    },
+    "webgraph_it": {
+        "Tri time": 4.255,
+        "Sync Time": 0.577,
+        "Shrink Time": 5.46,
+        "Scan Time": 11.493,
+        "Proc Time": 70.4,
+        "Total computation cost": 92.242
+    },
+    "webgraph_twitter": {
+        "Tri time": 61.497,
+        "Sync Time": 0.32,
+        "Shrink Time": 11.193,
+        "Scan Time": 10.353,
+        "Proc Time": 172.798,
+        "Total computation cost": 256.331
+    }
+}

@@ -1,0 +1,22 @@
+{
+  "algorithm_abbr": {
+    "scan-xp-avx512-merge": "M",
+    "scan-xp-avx512-hybrid": "MPS",
+    "scan-xp-naive-bitvec-hbw-2d": "BMP",
+    "scan-xp-avx2-merge": "M",
+    "scan-xp-avx2-hybrid": "MPS",
+    "scan-xp-naive-bitvec-2d": "BMP",
+    "scan-xp-cuda-hybrid-kernels-multi-gpu-multi-pass-dynamic-lb": "MPS",
+    "scan-xp-cuda-bitmap-warp-per-vertex-multi-gpu-multi-pass-dynamic-lb": "BMP",
+    "MPS-AVX2": "MPS-AVX2",
+    "CPU-MPS": "MPS",
+    "KNL-MPS": "MPS",
+    "MPS-AVX512": "MPS-AVX-512",
+    "CPU-BMP-RF": "BMP-RF",
+    "KNL-BMP-RF": "BMP-RF",
+    "BMP-Cache": "BMP-Cache",
+    "MPS-Cache": "MPS-Cache",
+    "BMP-Flat": "BMP-Flat",
+    "MPS-Flat": "MPS-Flat"
+  }
+}
