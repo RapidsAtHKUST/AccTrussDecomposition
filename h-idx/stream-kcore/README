@@ -1,0 +1,70 @@
+- Install sparsehash library from https://code.google.com/p/sparsehash/
+- Edit makefile to point the installed sparsehash library
+- Run compile.sh for compilation, it will give two binaries: stkcore and stkcoreRCD
+- Chaco (.graph) and matrix market (.mtx) formats are supported for graphs, one example is included for each
+- Runtime arguments are as follows:
+	./stkcore <graph> <mode> <algorithm> <hop> <# edges to remove/insert> <edge generation>
+	
+	- <graph> is the input graph file in either chaco (.graph) or matrix market (.mtx) format
+	- <mode> is LOAD, SAVE or JUST_RUN (1, 2, 3 respectively). First two only needed for faster experiments
+	- <algorithm> is N_CORE, TRAVERSAL or N_TRAVERSAL  (1, 2, 3 respectively). Used to select appropriate algorithm variant
+	- <hop> is the number of hops explored in the algorithm
+	- <# edges to remove/insert> is the number of edges that will be removed and inserted. Each edge is first removed (randomly), then inserted back
+	- <edge generation> is RANDOM_GENERATION or FROM_FILE (0 and 1). RANDOM_GENERATION generates random edges and put in <graph>_edges file, which can
+	be reused by FROM_FILE choice (for comparison experiments that remove and insert same edges)
+	
+- Options for the algorithms in VLDBJ paper (see the bottom for references) are as follows:
+	SUBCORE:			./stkcore 		<graph> 3 1 1 <#edges> <edge generation>
+	PURECORE:			./stkcore 		<graph> 3 1 2 <#edges> <edge generation>
+	SUBCORE w/ RCD:		./stkcoreRCD 	<graph> 3 1 1 <#edges> <edge generation>
+	PURECORE w/ RCD:	./stkcoreRCD 	<graph> 3 1 2 <#edges> <edge generation>
+	TRAVERSAL (w/ RCD): ./stkcoreRCD	<graph> 3 2 2 <#edges> <edge generation>
+	3HOP (w/ RCD):		./stkcoreRCD 	<graph> 3 3 3 <#edges> <edge generation>
+	4HOP (w/ RCD):		./stkcoreRCD 	<graph> 3 3 4 <#edges> <edge generation>
+	5HOP (w/ RCD):		./stkcoreRCD 	<graph> 3 3 5 <#edges> <edge generation>
+	6HOP (w/ RCD):		./stkcoreRCD 	<graph> 3 3 6 <#edges> <edge generation>
+	
+	note: for fast and easy multihop experiments, use SAVE and LOAD.
+	For example "./stkcoreRCD <graph> 2 3 4 <#edges> 1" saves the K and hop values (up to 4).
+	Then, "./stkcoreRCD <graph> 1 3 4 <#edges> 1" will bootstrap those K and hop values from
+	the <graph>_IS file	and experiments can be run quickly
+		
+- Examples: 
+	- removing and inserting 10 random edges to condmat with "SUBCORE w/ RCD" algorithm:
+		./stkcoreRCD condmat.graph 3 1 1 10 0
+	- removing and inserting those 10 generated edges to condmat with "TRAVERSAL (w/ RCD)" algorithm:
+		./stkcoreRCD condmat.graph 3 2 2 10 1
+	- removing and inserting those 10 generated edges to condmat with "4HOP (w/ RCD)" algorithm:
+		SLOW: ./stkcoreRCD condmat.graph 3 3 4 10 1
+		FAST: ./stkcoreRCD condmat.graph 2 3 4 10 1; ./stkcoreRCD condmat.graph 1 3 4 10 
+	
+- "out_base.txt" and "out_stream.txt" files are produced after run is completed.
+First one keeps the K values of the graph after traditional kcore, and
+second one has the K values after edges removed and inserted. Difference
+can be checked for verification.
+
+- Output lines are in the following format:
+    <removal/insertion> <u>-<v> updateKTm: <elapsedTimeToUpdateKValues> maintenanceTm: <elapsedTimeToMaintainRCDValues>  size (v,e):<#verticesTraversed>, <#edgesTraversed> nChKv: <#verticesWithChangedKValue> Ks: <KofVertexu> <KofVertexv>
+    example:
+    "removal: 10082- 10083 updateKTm: 0.000143 size (v,e): 3, 4 nChKv:  2 Ks: 5 8" means the following:
+    the edge between vertex 10082 (with K value of 5) and 10083 (with K value of 8) is removed. 3 vertices
+    and 5 edges traversed to change K values of 2 vertices. 0.000143 sec is spend to do entire removal operation.
+  
+- If you use the code, please cite the following works:
+
+"Streaming Algorithms for k-core Decomposition"
+A. Erdem Sariyuce, Bugra Gedik, Gabriela Jacques-Silva, Kun-Lung Wu, Umit V. Catalyurek
+International Conference on Very Large Data Bases (VLDB), 2013
+
+"Incremental k-core Decomposition: Algorithms and Evaluation"
+A. Erdem Sariyuce, Bugra Gedik, Gabriela Jacques-Silva, Kun-Lung Wu, Umit V. Catalyurek
+Very Large Data Bases Journal (VLDBJ), 25(3), 425-447, 2016
+
+- If you have any questions, please ask: a.erdemsariyuce@gmail.com
+
+
+
+
+
+
+
