@@ -4,6 +4,7 @@
 
 ```zsh
 cmake ${src-dir-path} -DBUILD_SERIAL=ON -DPLAYGROUND=OFF -DLEGACY_PKT_ALL=ON
+make -j
 ```
 
 * Some build options are as follows
