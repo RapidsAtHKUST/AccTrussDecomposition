@@ -23,6 +23,20 @@ Kabir et al.'s work (HiPC'17, HPEC'17) | PKT | [opt-truss-decomp/pkt_serial](opt
 Smith el al.'s work (HPEC'17) | MSP | [opt-truss-decomp/msp](opt-truss-decomp/msp)
 Sariyuce el al.'s work (VLDB'19) | H-IDX, H-IDX+ (our improved version) | [h-idx/pnd](h-idx/pnd)
 
+## Datasets (Input) Pre-Processing 
+
+* Real-World Graph 
+
+We use the converter in [ppSCAN-release](https://github.com/RapidsAtHKUST/ppSCAN/tree/master/ppSCAN-release) 
+to transform an `edge list txt file` into our format (two binary files `b_degree.bin` and `b_adj.bin` under a folder). 
+These two binary files contain the information for the reconstruction of the Compressed Sparse Row (CSR) format.
+Please see [Lijun's datasets format](https://github.com/LijunChang/Cohesive_subgraph_book/tree/master/datasets) for more details.
+
+* Synthetic-Graph 
+
+Please see [doc/RapidsSyntheticGraphGen.md](doc/RapidsSyntheticGraphGen.md) to install graph generators and 
+format converters (GT Graph Generator (3 types), Random, RMAT, Clique; Kronecker Model (RMAT) Graph; Parallel Graph Pre-Processing and Conversion). 
+
 ## Dependencies
 
 Folder | Comment
