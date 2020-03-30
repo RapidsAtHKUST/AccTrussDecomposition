@@ -1,0 +1,17 @@
+core_decompose
+eco_decompose
+.vscode
+*.pyc
+*.csv
+*.tsv
+*.o
+*.zip
+*.gz
+*.class
+dataset
+build
+cmake-build-debug
+.idea
+.project
+.cproject
+abstract.txt
