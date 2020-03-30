@@ -37,6 +37,11 @@ Please see [Lijun's datasets format](https://github.com/LijunChang/Cohesive_subg
 Please see [doc/RapidsSyntheticGraphGen.md](doc/RapidsSyntheticGraphGen.md) to install graph generators and 
 format converters (GT Graph Generator (3 types), Random, RMAT, Clique; Kronecker Model (RMAT) Graph; Parallel Graph Pre-Processing and Conversion). 
 
+* Statistics
+
+The statistics (|V|, |E|, |TC|, avg-deg, max-deg, dodg-max-deg, max-core-val, core-histogram) 
+can be collected using our tool in [KroneckerBinEdgeListToCSR](https://github.com/RapidsAtHKUST/KroneckerBinEdgeListToCSR)
+
 ## Build
 
 We build the four cmake project [h-idx](h-idx), [msp](msp), [opt-truss-decomp](opt-truss-decomp) 
@@ -99,6 +104,10 @@ see [python_experiments/run_experiments/run_necleus_decomposition.py](python_exp
 ./pnd /mnt/storage1/yche/datasets/snap_livejournal 2300
 ./hidx-org /mnt/storage1/yche/datasets/snap_livejournal 2300
 ```
+
+### More Experiments
+
+see [python_experiments/run_experiments](python_experiments/run_experiments)
 
 ## Dependencies
 
