@@ -1,14 +1,18 @@
 #pragma once
 
+#include <cmath>
+#include <omp.h>
+#include <x86intrin.h>
+
 #include "util/search/search_util.h"
 #include "util/jetbrains_fake.h"
 #include "util/graph/graph.h"
 
-#include <x86intrin.h>
+#include <opt_pkt/extern_variables.h>
 
 #define ENABLE_AVX2
 
-inline void SetIntersectionScalarMergeDetail(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t off_nei_v, eid_t vEnd,
+inline void SetIntersectionScalarMergeDetail(graph_t *g, eid_t &off_nei_u, eid_t uEnd, eid_t &off_nei_v, eid_t vEnd,
                                              vector<pair<eid_t, eid_t >> &intersection_res, size_t &beg) {
     if (off_nei_u < uEnd && off_nei_v < vEnd) {
         while (true) {
@@ -132,6 +136,8 @@ inline void SetIntersectionMergeSSE4Detail(graph_t *g, uint32_t off_nei_u, uint3
         SetInterMergeSSE4DetailTwoTwo(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
     }
     SetIntersectionScalarMergeDetail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
+    static thread_local auto tid = omp_get_thread_num();
+    tls_vm_cmp_stat[tid] += uEnd - off_nei_u + vEnd - off_nei_v + 2;
 }
 
 inline void SetIntersectionMergeSSE4(graph_t *g, uint32_t off_nei_u, uint32_t uEnd, uint32_t off_nei_v,
@@ -262,6 +268,7 @@ inline void SetIntersectionMergeAVX2(graph_t *g, eid_t off_nei_u, eid_t uEnd, ei
 
 #ifndef U16_HELPER
 #define U16_HELPER
+
 inline std::uint16_t operator "" _u(unsigned long long value) {
     return static_cast<std::uint16_t>(value);
 }
@@ -390,13 +397,31 @@ inline void SetIntersectionMergeAVX512(graph_t *g, eid_t off_nei_u, eid_t uEnd, 
 
 inline void SetInterSectionLookup(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t off_nei_v, eid_t vEnd,
                                   vector<pair<eid_t, eid_t >> &intersection_res, size_t &beg) {
+    static thread_local auto tid = omp_get_thread_num();
+#ifdef DISABLE_PSM
+    tls_vm_stat[tid]++;
+//    tls_vm_cmp_stat[tid] += uEnd - off_nei_u + vEnd - off_nei_v + 2;
+#if defined(__AVX512F__)
+        SetIntersectionMergeAVX512Detail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
+#elif defined(__AVX2__)
+        SetIntersectionMergeAVX2Detail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
+#elif  defined(__SSE4_1__)
+        SetIntersectionMergeSSE4Detail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
+#else
+        SetIntersectionScalarMergeDetail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
+#endif
+        return;
+#endif
     if (uEnd - off_nei_u > vEnd - off_nei_v) {
         swap(uEnd, vEnd);
         swap(off_nei_u, off_nei_v);
     }
     beg = 0;
+
 #if defined(ENABLE_VEC)
     if ((uEnd - off_nei_u) * 50 > (vEnd - off_nei_v)) {
+        tls_vm_stat[tid]++;
+//        tls_vm_cmp_stat[tid] += uEnd - off_nei_u + vEnd - off_nei_v + 2;
 #if defined(__AVX512F__)
         SetIntersectionMergeAVX512Detail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
 #elif defined(__AVX2__)
@@ -405,13 +430,18 @@ inline void SetInterSectionLookup(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t
         SetIntersectionMergeSSE4Detail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
 #endif
     } else {
+#ifdef PSM_STAT
+        tls_psm_stat[tid]++;
+#endif
 #endif
         while (true) {
+            auto prev_off = off_nei_u;
 #ifdef __AVX512F__
             off_nei_u = LinearSearchAVX512(g->adj, off_nei_u, uEnd, g->adj[off_nei_v]);
 #else
             off_nei_u = LinearSearch(g->adj, off_nei_u, uEnd, g->adj[off_nei_v]);
 #endif
+            tls_psm_cmp_stat[tid] += off_nei_u - prev_off + 1;
             if (off_nei_u >= uEnd) {
                 break;
             }
@@ -425,6 +455,7 @@ inline void SetInterSectionLookup(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t
             if (off_nei_v >= vEnd) {
                 break;
             }
+            tls_psm_cmp_stat[tid]++;
             if (g->adj[off_nei_u] == g->adj[off_nei_v]) {
                 intersection_res[beg++] = make_pair(off_nei_v, off_nei_u);
                 ++off_nei_u;

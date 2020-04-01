@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include <cmath>
+#include "extern_variables.h"
 
 // For the OpenMP outer parallel region purpose.
 size_t tc_cnt = 0;
@@ -33,3 +34,8 @@ int lookup_dict2[] = {
 int lookup_dict3[] = {
         0, 0, 1, 0
 };
+
+vector<size_t> tls_psm_stat;
+vector<size_t> tls_vm_stat;
+vector<size_t> tls_psm_cmp_stat;
+vector<size_t> tls_vm_cmp_stat;

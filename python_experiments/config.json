@@ -28,9 +28,9 @@
       "snap_orkut"
     ],
     "data_set_lst": [
-      "s19-16",
-      "s20-16",
-      "s21-16"
+      "webgraph_eu",
+      "webgraph_it",
+      "webgraph_twitter"
     ]
   },
   "hnode-79": {

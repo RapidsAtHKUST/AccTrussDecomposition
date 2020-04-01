@@ -1,6 +1,10 @@
 #include "search_util.h"
 
 #include <x86intrin.h>
+#include <cmath>
+#include <omp.h>
+
+#include "opt_pkt/extern_variables.h"
 
 #ifdef __AVX2__
 
@@ -123,16 +127,20 @@ uint32_t LinearSearchAVX512(int *array, uint32_t offset_beg, uint32_t offset_end
 }
 
 uint32_t BinarySearchForGallopingSearchAVX512(const int *array, uint32_t offset_beg, uint32_t offset_end, int val) {
+    static thread_local auto tid = omp_get_thread_num();
     while (offset_end - offset_beg >= 32) {
         auto mid = static_cast<uint32_t>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
         _mm_prefetch((char *) &array[(static_cast<unsigned long>(mid + 1) + offset_end) / 2], _MM_HINT_T0);
         _mm_prefetch((char *) &array[(static_cast<unsigned long>(offset_beg) + mid) / 2], _MM_HINT_T0);
         if (array[mid] == val) {
+            tls_psm_cmp_stat[tid] += 1;
             return mid;
         } else if (array[mid] < val) {
             offset_beg = mid + 1;
+            tls_psm_cmp_stat[tid] += 1;
         } else {
             offset_end = mid;
+            tls_psm_cmp_stat[tid] += 1;
         }
     }
 
@@ -156,7 +164,9 @@ uint32_t BinarySearchForGallopingSearchAVX512(const int *array, uint32_t offset_
 }
 
 uint32_t GallopingSearchAVX512(int *array, uint32_t offset_beg, uint32_t offset_end, int val) {
+    static thread_local auto tid = omp_get_thread_num();
     if (array[offset_end - 1] < val) {
+        tls_psm_cmp_stat[tid] += 1;
         return offset_end;
     }
 
@@ -184,8 +194,11 @@ uint32_t GallopingSearchAVX512(int *array, uint32_t offset_beg, uint32_t offset_
 //    _mm512_mask_prefetch_i64gather_ps(prefetch_idx, mask, array + offset_beg, 1, _MM_HINT_T0);
 
     while (true) {
+
         auto peek_idx = offset_beg + jump_idx;
         if (peek_idx >= offset_end) {
+            tls_psm_cmp_stat[tid] += ceil(log2(jump_idx)) + 1;
+
             return BinarySearchForGallopingSearchAVX512(array, (jump_idx >> 1) + offset_beg + 1, offset_end, val);
         }
         if (array[peek_idx] < val) {

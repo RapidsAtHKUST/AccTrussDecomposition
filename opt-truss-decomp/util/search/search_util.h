@@ -3,7 +3,8 @@
 #include <x86intrin.h>
 
 #include <cstdint>
-
+#include <omp.h>
+#include "opt_pkt/extern_variables.h"
 #include "util/jetbrains_fake.h"
 #include "util/log/log.h"
 
@@ -23,7 +24,10 @@ uint32_t BranchFreeBinarySearch(T *a, uint32_t offset_beg, uint32_t offset_end, 
     int32_t n = offset_end - offset_beg;
     using I = uint32_t;
     const T *base = a + offset_beg;
+    static thread_local auto tid = omp_get_thread_num();
     while (n > 1) {
+        if (tls_psm_cmp_stat.size() > 0)
+            tls_psm_cmp_stat[tid]++;
         I half = n / 2;
         __builtin_prefetch(base + half / 2, 0, 0);
         __builtin_prefetch(base + half + half / 2, 0, 0);
@@ -68,16 +72,27 @@ bool BranchFreeBSExists(T *a, uint32_t offset_beg, uint32_t offset_end, T x) {
 // Assuming (offset_beg != offset_end)
 template<typename T>
 uint32_t GallopingSearch(T *array, uint32_t offset_beg, uint32_t offset_end, T val) {
+    static thread_local auto tid = omp_get_thread_num();
+
+    if (tls_psm_cmp_stat.size() > 0)
+        tls_psm_cmp_stat[tid]++;
     if (array[offset_end - 1] < val) {
         return offset_end;
     }
     // galloping
+    if (tls_psm_cmp_stat.size() > 0)
+        tls_psm_cmp_stat[tid]++;
     if (array[offset_beg] >= val) {
         return offset_beg;
     }
+
+    if (tls_psm_cmp_stat.size() > 0)
+        tls_psm_cmp_stat[tid]++;
     if (array[offset_beg + 1] >= val) {
         return offset_beg + 1;
     }
+    if (tls_psm_cmp_stat.size() > 0)
+        tls_psm_cmp_stat[tid]++;
     if (array[offset_beg + 2] >= val) {
         return offset_beg + 2;
     }
@@ -85,6 +100,8 @@ uint32_t GallopingSearch(T *array, uint32_t offset_beg, uint32_t offset_end, T v
     auto jump_idx = 4u;
     while (true) {
         auto peek_idx = offset_beg + jump_idx;
+        if (tls_psm_cmp_stat.size() > 0)
+            tls_psm_cmp_stat[tid]++;
         if (peek_idx >= offset_end) {
             return BranchFreeBinarySearch(array, (jump_idx >> 1u) + offset_beg + 1, offset_end, val);
         }

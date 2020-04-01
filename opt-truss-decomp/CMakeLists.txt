@@ -14,7 +14,8 @@ else ()
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)   # dump compilation commands to compile_commands.json
 endif ()
 
-add_compile_options(-Wall -O3 -g -march=native)
+#add_compile_options(-Wall -O3 -g -march=native)
+add_compile_options(-O3 -g -march=native)
 #add_compile_options(-Wall -O0 -g -march=native)
 add_definitions(-DUSE_LOG -DTIME_RESULTS)
 option(USE_JEMALLOC "use jemalloc" ON)
@@ -128,6 +129,9 @@ endfunction()
 
 ############### Parallel Experimental Executables #################
 build_varying_parameters(pkt-varying "" "")
+
+build_truss_algorithm(pkt-disable-psm "PKT_INTER=1" opt_pkt/pkt_merge.cpp) ### (Starts From Skew-Handling and VecOpt)
+target_compile_definitions(pkt-disable-psm PRIVATE "DISABLE_BUCKET_OPT=1;NO_SHRINK_GRAPH=1;NO_TC_OPT=1;PEEL_TRI_BASELINE=1;WITHOUT_FIRST_LAST_LEVEL_OPT=1;DISABLE_PSM=1")
 
 build_truss_algorithm(pkt-vm "PKT_INTER=1" opt_pkt/pkt_merge.cpp) ### (Starts From Skew-Handling and VecOpt)
 target_compile_definitions(pkt-vm PRIVATE "DISABLE_BUCKET_OPT=1;NO_SHRINK_GRAPH=1;NO_TC_OPT=1;PEEL_TRI_BASELINE=1;WITHOUT_FIRST_LAST_LEVEL_OPT=1;")
