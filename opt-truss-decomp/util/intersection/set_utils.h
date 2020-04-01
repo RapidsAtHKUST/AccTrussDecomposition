@@ -136,8 +136,6 @@ inline void SetIntersectionMergeSSE4Detail(graph_t *g, uint32_t off_nei_u, uint3
         SetInterMergeSSE4DetailTwoTwo(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
     }
     SetIntersectionScalarMergeDetail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
-    static thread_local auto tid = omp_get_thread_num();
-    tls_vm_cmp_stat[tid] += uEnd - off_nei_u + vEnd - off_nei_v + 2;
 }
 
 inline void SetIntersectionMergeSSE4(graph_t *g, uint32_t off_nei_u, uint32_t uEnd, uint32_t off_nei_v,
@@ -400,7 +398,7 @@ inline void SetInterSectionLookup(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t
     static thread_local auto tid = omp_get_thread_num();
 #ifdef DISABLE_PSM
     tls_vm_stat[tid]++;
-//    tls_vm_cmp_stat[tid] += uEnd - off_nei_u + vEnd - off_nei_v + 2;
+    tls_vm_cmp_stat[tid] += uEnd - off_nei_u + vEnd - off_nei_v + 2;
 #if defined(__AVX512F__)
         SetIntersectionMergeAVX512Detail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
 #elif defined(__AVX2__)
@@ -421,7 +419,7 @@ inline void SetInterSectionLookup(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t
 #if defined(ENABLE_VEC)
     if ((uEnd - off_nei_u) * 50 > (vEnd - off_nei_v)) {
         tls_vm_stat[tid]++;
-//        tls_vm_cmp_stat[tid] += uEnd - off_nei_u + vEnd - off_nei_v + 2;
+        tls_vm_cmp_stat[tid] += uEnd - off_nei_u + vEnd - off_nei_v + 2;
 #if defined(__AVX512F__)
         SetIntersectionMergeAVX512Detail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
 #elif defined(__AVX2__)
@@ -430,9 +428,7 @@ inline void SetInterSectionLookup(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t
         SetIntersectionMergeSSE4Detail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
 #endif
     } else {
-#ifdef PSM_STAT
         tls_psm_stat[tid]++;
-#endif
 #endif
         while (true) {
             auto prev_off = off_nei_u;

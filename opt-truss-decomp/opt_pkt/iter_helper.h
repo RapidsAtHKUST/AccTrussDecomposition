@@ -418,11 +418,11 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
     }  //End of parallel region
     log_info("Total computation cost: %.9lfs", comp_timer.elapsed_and_reset());
 
-    log_info("#VM / #PSM :%s; %s", FormatWithCommas(accumulate(begin(tls_vm_stat), end(tls_vm_stat), 0)).c_str(),
-             FormatWithCommas(accumulate(begin(tls_psm_stat), end(tls_psm_stat), 0)).c_str());
+    log_info("#VM / #PSM :%s; %s", FormatWithCommas(accumulate(begin(tls_vm_stat), end(tls_vm_stat), (size_t)0)).c_str(),
+             FormatWithCommas(accumulate(begin(tls_psm_stat), end(tls_psm_stat), (size_t)0)).c_str());
     log_info("#VM-cmp / #PSM-cmpt :%s; %s",
-             FormatWithCommas(accumulate(begin(tls_vm_cmp_stat), end(tls_vm_cmp_stat), 0)).c_str(),
-             FormatWithCommas(accumulate(begin(tls_psm_cmp_stat), end(tls_psm_cmp_stat), 0)).c_str());
+             FormatWithCommas(accumulate(begin(tls_vm_cmp_stat), end(tls_vm_cmp_stat), (size_t)0)).c_str(),
+             FormatWithCommas(accumulate(begin(tls_psm_cmp_stat), end(tls_psm_cmp_stat), (size_t)0)).c_str());
 
     // Copy Back to Edge Support.
 #ifdef SHRINK_EDGE_LIST

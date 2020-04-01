@@ -42,7 +42,7 @@ def run_exp(env_tag=knl_tag, with_c_group=True, data_path_tag=k_truss_exec_path_
     thread_num_lst = [64] if env_tag is gpu24_tag else [40]
 
     exp_res_root_name = 'exp_results'
-    folder_name = 'exp-2020-04-01' + os.sep + hostname
+    folder_name = 'exp-2020-04-01-psm-effect' + os.sep + hostname
     org_order_lst = ['org']
     our_reorder_dict = {
         'ustgpu2': org_order_lst,
