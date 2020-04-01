@@ -7,14 +7,14 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 ## Show Compilation Commands
-option(DUMP_COMPILATION_TO_FILE "dump compilation to files" OFF)
+option(DUMP_COMPILATION_TO_FILE "dump compilation to files" ON)
 if (NOT DUMP_COMPILATION_TO_FILE)
     set(CMAKE_VERBOSE_MAKEFILE ON)
 else ()
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)   # dump compilation commands to compile_commands.json
 endif ()
 
-add_compile_options(-Wall -O3 -g -march=native)
+add_compile_options(-O3 -g -march=native)
 #add_compile_options(-Wall -O0 -g -march=native)
 add_definitions(-DUSE_LOG -DTIME_RESULTS)
 option(USE_JEMALLOC "use jemalloc" ON)

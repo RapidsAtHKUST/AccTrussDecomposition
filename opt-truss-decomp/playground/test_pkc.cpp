@@ -19,7 +19,7 @@
 using namespace std;
 
 //Number of threads used
-int NUM_THREADS = 1;
+int PKC_NUM_THREADS = 1;
 
 //typedef unsigned int vid_t;
 typedef unsigned int eid_t;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
     /* If the graph has at least 1000 vertices use PKC  */
     start_time = timer();
-    PKC(&g, core, NUM_THREADS);
+    PKC(&g, core, PKC_NUM_THREADS);
     auto histogram = core_val_histogram(g.n, core);
     stringstream ss;
 
