@@ -99,10 +99,6 @@ public:
 
     void ShrinkCSREID(volatile eid_t *global_buffer_size, vid_t *local_buffer);
 
-    void CompactCSREID();
-
-    void ShrinkEdgeList();
-
     void MarkProcessed();
 
     void SwapCurNextQueue();
@@ -159,36 +155,7 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
     vector<double> tc_level_time;
     double init_tc_time = 0;
     double penalty_tc_time = 0;
-#ifdef PAPER_FIGURE
-    {
-        stringstream ss;
-        ss << pretty_print_array(g->num_edges, g->n + 1);
-        log_info("CSR-off: %s", ss.str().c_str());
 
-        reset(ss);
-        ss << pretty_print_array(g->adj, g->m);
-        log_info("CSR-adj: %s", ss.str().c_str());
-
-        reset(ss);
-        ss << pretty_print_array(g->eid, g->m);
-        log_info("Map-eid: %s", ss.str().c_str());
-
-        vector<int> src;
-        vector<int> dst;
-        for (int i = 0; i < g->m / 2; i++) {
-            src.emplace_back(edgeIdToEdge[i].u);
-            dst.emplace_back(edgeIdToEdge[i].v);
-        }
-        reset(ss);
-        ss << src;
-        log_info("Edge-src: %s", ss.str().c_str());
-
-        reset(ss);
-        ss << dst;
-        log_info("Edge-dst: %s", ss.str().c_str());
-    }
-
-#endif
 #pragma omp parallel
     {
         size_t acc_process_num = 0;
@@ -199,18 +166,6 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
         iter_helper.ComputeTriSupport(iter_stat_tls);
 #pragma omp single
         {
-#ifdef PAPER_FIGURE
-            if (g->m < 40) {
-                stringstream ss;
-                ss << pretty_print_array(EdgeSupport, g->m / 2);
-                vector<pair<pair<int, int>, int>> edge_list;
-                for (auto i = 0; i < g->m / 2; i++) {
-                    edge_list.emplace_back(make_pair(edgeIdToEdge[i].u, edgeIdToEdge[i].v), EdgeSupport[i]);
-                }
-                ss << edge_list << endl;
-                log_info("Edge Support Array: %s", ss.str().c_str());
-            }
-#endif
             init_tc_time = iter_stat_tls.triTime;
             iter_timer.reset();
             log_info("TC time: %.9lfs", init_tc_time);
@@ -233,71 +188,23 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
             iter_helper.SCANGraph(level);
             iter_stat_tls.RecordSCANTime();
 
-#ifdef SHRINK_EDGE_LIST
-#pragma omp single
-            {
-                iter_helper.level_start_pos_[level + 1] = iter_helper.level_start_pos_[level];
-            }
-#endif
             // 3rd: Processing the graph (shrinking and updating supports).
             while (iter_helper.curr_tail_ > 0) {
                 // Map the curr_ to result array.
-#ifdef PAPER_FIGURE
-#pragma omp single
-                {
-                    stringstream ss;
-                    vector<pair<int, int>> edge_lst;
-                    for (auto i = 0; i < iter_helper.curr_tail_; i++) {
-                        auto edge = (*iter_helper.edge_lst_ptr_)[iter_helper.curr_[i]];
-                        edge_lst.emplace_back(edge.u, edge.v);
-                    }
-                    sort(edge_lst.begin(), edge_lst.end());
-                    ss << edge_lst;
-                    log_info("Curr Queue: %s", ss.str().c_str());
-                }
-#endif
-#ifdef SHRINK_EDGE_LIST
-#pragma omp for
-                for (auto i = 0; i < max_omp_threads; i++) {
-                    auto avg = iter_helper.curr_tail_ / max_omp_threads;
-                    auto iter_beg = avg * i;
-                    auto iter_end = (i == max_omp_threads - 1) ? iter_helper.curr_tail_ : avg * (i + 1);
-                    auto pos_off = iter_helper.level_start_pos_[level + 1];
-                    for (auto iter = iter_beg; iter < iter_end; iter++) {
-                        // map operation.
-                        iter_helper.edge_offsets_level_[pos_off + iter] =
-                                iter_helper.edge_off_org_[iter_helper.curr_[iter]];
-                    }
-                }
-#pragma omp single
-                {
-                    iter_helper.level_start_pos_[level + 1] += iter_helper.curr_tail_;
-                }
-#endif
-
                 todo = todo - iter_helper.curr_tail_;
                 iter_stat_tls.RecordQueueSize(iter_helper.curr_tail_);
-#ifndef WITHOUT_FIRST_LAST_LEVEL_OPT
                 // All of them being the last level.
                 if (todo == 0) {
                     // No need to process but need to copy the results back.
                     level = level + 1;
                     break;
                 }
-#endif
 
-#ifndef NO_SHRINK_GRAPH
                 // 3.1: Optional shrinking graph. (Move to here to maximally shrink the graph).
                 if (acc_deleted > numEdges / graph_compaction_threshold) {
 #pragma omp barrier
                     Timer shrink_timer;
                     iter_helper.ShrinkCSREID(&global_v_buff_size, local_buffer);
-#ifdef COMPACT_CSR
-                    iter_helper.CompactCSREID();
-#endif
-#ifdef SHRINK_EDGE_LIST
-                    iter_helper.ShrinkEdgeList();
-#endif
                     acc_deleted = 0;
 #pragma omp single
                     {
@@ -305,23 +212,13 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
                         shrink_time_lst.emplace_back(shrink_timer.elapsed());
                     }
                 }
-#endif
                 iter_stat_tls.RecordShrinkTime();
 
                 // 3.2: Real Processing (updating supports).
-#ifndef WITHOUT_FIRST_LAST_LEVEL_OPT
                 if (level == 0) {
                     iter_helper.ProcessSupportZeros();
                 } else {
-#endif
 
-#ifdef NO_TC_OPT
-                    {
-                        auto to_delete = iter_helper.curr_tail_;
-                        f(level);
-                        acc_deleted += to_delete;
-                    }
-#else
                     size_t task_size = iter_helper.curr_tail_ * (size_t) (level + 1);
                     size_t left_edge_size = todo;
                     double estimated_tc_time = left_edge_size / (g->m / 2.0) * init_tc_time + penalty_tc_time;
@@ -359,28 +256,13 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
                             tc_level_time.emplace_back(cost);
                         }
                     }
-#endif
-#ifndef WITHOUT_FIRST_LAST_LEVEL_OPT
                 }
-#endif
 
                 // 3.3: Swap Queues.
 #pragma omp single
                 {
                     iter_helper.SwapCurNextQueue();
                     iter_stat_tls.RecordIterNum(iter_num, local_iter_num);
-#ifdef PAPER_FIGURE
-                    if (g->m < 40) {
-                        stringstream ss;
-                        ss << pretty_print_array(EdgeSupport, g->m / 2);
-                        vector<pair<pair<int, int>, int>> edge_list;
-                        for (auto i = 0; i < g->m / 2; i++) {
-                            edge_list.emplace_back(make_pair(edgeIdToEdge[i].u, edgeIdToEdge[i].v), EdgeSupport[i]);
-                        }
-                        ss << edge_list << endl;
-                        log_info("Edge Support Array: %s", ss.str().c_str());
-                    }
-#endif
                 }
 #pragma omp barrier
                 iter_stat_tls.RecordProcessTime();
@@ -394,9 +276,6 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
 #pragma omp single
         {
             iter_helper.level_size_ = level;
-#ifdef SHRINK_EDGE_LIST
-            assert(iter_helper.level_start_pos_[iter_helper.level_size_ - 1] == numEdges);
-#endif
             log_info("Total Levels: %d", iter_helper.level_size_);
             log_trace("Last Level Finished: %d, Elapsed Time: %.9lfs, Left/Total: %'lld/%'lld, "
                       "Local/Global-Iter#: %zu/%zu", level - 1,
@@ -413,16 +292,5 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
         free(local_buffer);
     }  //End of parallel region
     log_info("Total computation cost: %.9lfs", comp_timer.elapsed_and_reset());
-
-    // Copy Back to Edge Support.
-#ifdef SHRINK_EDGE_LIST
-    for (auto i = 0; i < iter_helper.level_size_ - 1; i++) {
-#pragma omp for nowait
-        for (auto j = iter_helper.level_start_pos_[i]; j < iter_helper.level_start_pos_[i + 1]; j++) {
-            EdgeSupport[iter_helper.edge_offsets_level_[j]] = i;
-        }
-    }
-    log_info("Result Copy Time: %.9lfs ", comp_timer.elapsed());
-#endif
 }
 

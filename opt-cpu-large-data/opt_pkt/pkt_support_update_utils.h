@@ -10,13 +10,6 @@
 
 using word_type = uint32_t;
 
-void PKT_scan(long numEdges, int *EdgeSupport, int level, eid_t *curr, long *currTail, bool *InCurr);
-
-void PKT_processSubLevel_intersection_handling_skew(
-        graph_t *g, eid_t *curr, bool *InCurr, long currTail, int *EdgeSupport,
-        int level, eid_t *next, bool *InNext, long *nextTail, bool *processed,
-        Edge *edgeIdtoEdge);
-
 class SupportUpdater {
     int *EdgeSupport;
 
@@ -103,16 +96,16 @@ public:
 
     void PeelTriangleBaseline(eid_t e1, eid_t e2, eid_t e3,
 #ifdef BMP_PROCESSED
-                      BoolArray<word_type> &processed,
+                              BoolArray<word_type> &processed,
 #else
             const bool *processed,
 #endif
 #ifndef BMP_QUEUE
             const bool *InCurr
 #else
-                      BoolArray<word_type> &InCurr
+                              BoolArray<word_type> &InCurr
 #endif
-    ){
+    ) {
         if ((!processed[e2]) && (!processed[e3])) {
             //Decrease support of both e2 and e3
             if (EdgeSupport[e2] > level && EdgeSupport[e3] > level) {
@@ -151,9 +144,6 @@ public:
                       BoolArray<word_type> &InCurr
 #endif
     ) {
-#ifdef PEEL_TRI_BASELINE
-        PeelTriangleBaseline(e1, e2, e3, processed, InCurr);
-#else
         bool is_peel_e2 = !InCurr[e2];
         bool is_peel_e3 = !InCurr[e3];
 
@@ -174,7 +164,6 @@ public:
                 }
             }
         }
-#endif
     }
 };
 

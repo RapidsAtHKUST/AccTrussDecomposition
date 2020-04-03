@@ -127,7 +127,6 @@ inline int ComputeSupportWithPackIntermediate(graph_t *g, const eid_t *off_end, 
 #endif
     if (edge_sup_ref > level) {
         if (du > dv || ((du == dv) && (u < v))) {
-#ifndef MERGE_INTERSECT_INTERMEDIATE
             if (!partition_id_lst[v].empty()) {
                 for (auto wi = 0u; wi < partition_id_lst[v].size(); wi++) {
                     auto res = bool_arr.getWord(partition_id_lst[v][wi]) & bitmap_in_partition_lst[v][wi];
@@ -140,10 +139,7 @@ inline int ComputeSupportWithPackIntermediate(graph_t *g, const eid_t *off_end, 
                         local_cnt++;
                 }
             }
-#else
-            local_cnt = ComputeCNGallopingSingleDir(g, g->num_edges[u], off_end[u + 1], g->num_edges[v],
-                                                    off_end[v + 1]);
-#endif
+
             if (local_cnt < level) {
                 local_cnt = level;
             }
