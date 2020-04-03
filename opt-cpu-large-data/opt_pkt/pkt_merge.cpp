@@ -13,23 +13,11 @@ vector<size_t> SupportUpdater::sup_update_num_arr;
 
 //Process a sub-level in a level using intersection based approach
 void PKT_processSubLevel_intersection_handling_skew(graph_t *g, eid_t *curr,
-#ifndef BMP_QUEUE
-        bool *InCurr,
-#else
                                                     BoolArray<word_type> &InCurr,
-#endif
                                                     long currTail, int *EdgeSupport, int level, eid_t *next,
-#ifndef BMP_QUEUE
-        bool *InNext,
-#else
                                                     BoolArray<word_type> &InNext,
-#endif
                                                     long *nextTail,
-#ifndef BMP_PROCESSED
-        bool *processed,
-#else
                                                     BoolArray<word_type> &processed,
-#endif
                                                     Edge *edgeIdtoEdge, eid_t *off_end,
                                                     bool *is_vertex_updated, IterHelper &iter_helper
 ) {
@@ -73,10 +61,8 @@ void PKT_processSubLevel_intersection_handling_skew(graph_t *g, eid_t *curr,
             }
 
         }
-#ifndef NO_SHRINK_GRAPH
         is_vertex_updated[u] = true;
         is_vertex_updated[v] = true;
-#endif
     }
 
     sup_updater.SubmitLocalBufferNext();

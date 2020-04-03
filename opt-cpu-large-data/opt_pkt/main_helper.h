@@ -63,5 +63,3 @@ inline void display_stats(int *EdgeSupport, long numEdges, string output_folder)
 }
 
 void PKT_intersection(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge);
-
-void PKT_marking(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge);

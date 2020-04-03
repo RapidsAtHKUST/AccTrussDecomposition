@@ -2,23 +2,11 @@
 
 //Process a sub-level in a level using intersection based approach
 void TriCntDetailSubLevel(graph_t *g, eid_t *curr,
-#ifndef BMP_QUEUE
-        bool *InCurr,
-#else
                           BoolArray<word_type> &InCurr,
-#endif
                           long currTail, int *EdgeSupport, int level, eid_t *next,
-#ifndef BMP_QUEUE
-        bool *InNext,
-#else
                           BoolArray<word_type> &InNext,
-#endif
                           long *nextTail,
-#ifdef BMP_PROCESSED
                           BoolArray<word_type> &processed_,
-#else
-        bool *processed_,
-#endif
                           Edge *edgeIdtoEdge, eid_t *off_end,
                           bool *is_vertex_updated,
                           IterHelper &iter_helper,

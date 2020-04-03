@@ -23,26 +23,27 @@ def run_exp(env_tag=knl_tag, with_c_group=True, data_path_tag=k_truss_exec_path_
         # "ssca2-config-s17-c10000"
         # "snap_friendster"
 
-        "ssca-s17-c1k",
-        "ssca-s17-c2k",
-        "ssca-s17-c4k",
-        "ssca-s17-c6k",
-        "ssca-s17-c8k",
+        # "ssca-s17-c1k",
+        # "ssca-s17-c2k",
+        # "ssca-s17-c4k",
+        # "ssca-s17-c6k",
+        # "ssca-s17-c8k",
 
         "s22-16",
         "s23-16",
         "s24-16",
         "s25-16",
-
-        "ssca-s17-c10k",
         "s26-16",
-        "s27-16"
+        "s27-16",
+        # "s28-16",
+        # "s29-16"
     ]
     # thread_num_lst = [1, 2, 4, 8, 16, 32, 40, 56]
-    thread_num_lst = [64] if env_tag is gpu24_tag else [40]
+    # thread_num_lst = [64] if env_tag is gpu24_tag else [40]
+    thread_num_lst = [60] if env_tag is gpu24_tag else [40]
 
     exp_res_root_name = 'exp_results'
-    folder_name = 'exp-2020-01-09' + os.sep + hostname
+    folder_name = 'exp-2020-04-03-less-than-4G-edges' + os.sep + hostname
     org_order_lst = ['org']
     our_reorder_dict = {
         'ustgpu2': org_order_lst,
@@ -51,23 +52,23 @@ def run_exp(env_tag=knl_tag, with_c_group=True, data_path_tag=k_truss_exec_path_
         'gpu24': org_order_lst
     }
     our_exec_name_lst = [
-        'pkt-eid',
-        'pkt-eid-parallel',
-        'pkt-eval-tc-baseline',
-        'pkt-eval-tc-dtc',
-        'pkt-eval-tc-wp',
+        # 'pkt-eid',
+        # 'pkt-eid-parallel',
+        # 'pkt-eval-tc-baseline',
+        # 'pkt-eval-tc-dtc',
+        # 'pkt-eval-tc-wp',
 
-        'pkt-inter-legacy',
-        'pkt-inter-handle-skew',  # +PSM
-        'pkt-vm',  # +VM
-        'pkt-gc',  # +GC
-        'pkt-es',  # +ES
-        'pkt-dstcp',  # +DSTCP
-        'pkt-bmpf',  # +BMPF
+        # 'pkt-inter-legacy',
+        # 'pkt-inter-handle-skew',  # +PSM
+        # 'pkt-vm',  # +VM
+        # 'pkt-gc',  # +GC
+        # 'pkt-es',  # +ES
+        # 'pkt-dstcp',  # +DSTCP
+        # 'pkt-bmpf',  # +BMPF
         'pkt-inter-shrink',  # +IDX
 
-        'cuda-pkt-shrink-all',  # OFF-EIEP
-        'cuda-pkt-shrink-all-opt',  # OFF-EIEP + IDX
+        # 'cuda-pkt-shrink-all',  # OFF-EIEP
+        # 'cuda-pkt-shrink-all-opt',  # OFF-EIEP + IDX
         'cuda-pkt-offload-opt',  # OFF-RIEP + IDX
         'cuda-pkt-offload',  # OFF-RIEP
     ]
@@ -106,12 +107,13 @@ def run_exp(env_tag=knl_tag, with_c_group=True, data_path_tag=k_truss_exec_path_
 
                         # 2nd: run exec cmd
                         algorithm_path = our_exec_path + os.sep + our_algorithm
-                        params_lst = map(str, ['cgexec -g memory:yche-exp' if with_c_group else '',
-                                               algorithm_path, data_set_path + os.sep + data_set_name, reorder_method,
-                                               statistics_file_path])
+                        params_lst = map(str, [
+                            # 'cgexec -g memory:yche-exp' if with_c_group else '',
+                            algorithm_path, data_set_path + os.sep + data_set_name, reorder_method,
+                            statistics_file_path])
                         cmd = ' '.join(params_lst)
                         logger.info('exec-cmd: {}'.format(cmd))
-                        time_out = 3600 * 5 if 'cuda' not in our_algorithm else 600
+                        time_out = 3600 * 5 if 'cuda' not in our_algorithm else 3600 * 2
                         my_env = os.environ.copy()
 
                         def execute_cmd(my_cmd):

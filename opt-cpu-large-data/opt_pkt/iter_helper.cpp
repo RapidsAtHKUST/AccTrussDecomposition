@@ -8,27 +8,16 @@
 
 IterHelper::IterHelper(graph_t *g, int **edge_sup_ptr, Edge **edge_lst_ptr)
         : g(g), num_edges_(g->m / 2), n_(g->n),
-#ifdef BMP_PROCESSED
           processed_(num_edges_),
-#endif
           bucket_removed_indicator_(num_edges_),
           curr_tail_(0), next_tail_(0)
-#ifdef BMP_QUEUE
         , in_curr_(num_edges_), in_next_(num_edges_)
-#endif
         , edge_sup_ptr_(edge_sup_ptr), edge_lst_ptr_(edge_lst_ptr) {
     log_info("gt: %d, ept: %.3lf, rs: %d", graph_compaction_threshold, estimated_process_throughput, range_size);
     Timer malloc_timer;
-#ifndef BMP_PROCESSED
-    processed_ = (bool *) malloc(num_edges_ * sizeof(bool));
-#endif
     curr_ = (eid_t *) malloc(num_edges_ * sizeof(eid_t));
     next_ = (eid_t *) malloc(num_edges_ * sizeof(eid_t));
 
-#ifndef BMP_QUEUE
-    in_curr_ = (bool *) malloc(num_edges_ * sizeof(bool));
-    in_next_ = (bool *) malloc(num_edges_ * sizeof(bool));
-#endif
     log_info("Malloc Time: %.6lfs", malloc_timer.elapsed());
 
     level_size_ = 0;
@@ -90,22 +79,8 @@ void IterHelper::MemSetIterVariables(int max_omp_threads) {
         auto avg = num_edges_ / max_omp_threads;
         auto iter_beg = avg * i;
         auto iter_end = (i == max_omp_threads - 1) ? num_edges_ : avg * (i + 1);
-#ifndef BMP_PROCESSED
-        memset(processed_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(bool));
-#endif
-#ifndef BMP_QUEUE
-        memset(in_curr_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(bool));
-        memset(in_next_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(bool));
-#endif
         memset(in_bucket_window_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(bool));
         memset(bucket_buf_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(eid_t));
-
-#ifdef SHRINK_EDGE_LIST
-        // Identity.
-        for (auto j = iter_beg; j < iter_end; j++) {
-            edge_off_org_[j] = j;
-        }
-#endif
     }
 }
 
@@ -200,26 +175,14 @@ void IterHelper::SCANGraph(int level) {
 
     auto updater = [EdgeSupport, level, &local_queue_buf, this](eid_t i, eid_t buffer_id) {
         if (EdgeSupport[i] == level) {
-#ifdef USE_BUCKET_REMOVED_FILTER
-            bucket_removed_indicator_.set_atomic(buffer_id);
-#endif
             local_queue_buf.push(i);
-#ifndef BMP_QUEUE
-            in_curr_[i] = true;
-#else
             in_curr_.set_atomic(i);
-#endif
         }
     };
     auto updater_with_bkt = [EdgeSupport, level, &local_queue_buf, &local_bucket_buf, this](eid_t i) {
         if (EdgeSupport[i] == level) {
             local_queue_buf.push(i);
-
-#ifndef BMP_QUEUE
-            in_curr_[i] = true;
-#else
             in_curr_.set_atomic(i);
-#endif
         }
         if (EdgeSupport[i] > level && EdgeSupport[i] < bucket_level_end_) {
             bool get_token = __sync_bool_compare_and_swap(&in_bucket_window_[i], false, true);
@@ -232,9 +195,6 @@ void IterHelper::SCANGraph(int level) {
     if (level == bucket_level_end_) {
 #pragma omp barrier
         // Clear the bucket_removed_indicator
-#ifdef USE_BUCKET_REMOVED_FILTER
-        bucket_removed_indicator_.clearWordsInParallelOMP(window_bucket_buf_size_);
-#endif
 #pragma omp single
         {
             bucket_level_end_ += range_size;
@@ -242,7 +202,6 @@ void IterHelper::SCANGraph(int level) {
             window_bucket_buf_size_ = 0;
             log_info("Level: %d, bucket_level_end_: %d", level, bucket_level_end_);
         }
-#ifdef BMP_PROCESSED
 #pragma omp for schedule(dynamic, 1000)
         for (size_t word_idx = 0; word_idx < processed_.sizeOfWordsRange(num_edges_); word_idx++) {
             if (processed_.getWord(word_idx) == UINT32_MAX) {
@@ -255,17 +214,7 @@ void IterHelper::SCANGraph(int level) {
                 }
             }
         }
-#else
-#pragma omp for schedule(dynamic, 100)
-        for (auto u = 0; u < g->n; u++) {
-            for (auto j = g->num_edges[u]; j < off_end_[u + 1]; j++) {
-                if (u < g->adj[j]) {
-                    // no need to check processed.
-                    updater_with_bkt(g->eid[j]);
-                }
-            }
-        }
-#endif
+
         local_bucket_buf.submit_if_possible();
     } else {
         // TODO: Histogram to shrink (< current level). Or Remove Filtering.
@@ -274,24 +223,10 @@ void IterHelper::SCANGraph(int level) {
         {
             log_info("Level: %d, Bucket Size: %'zu", level, window_bucket_buf_size_);
         }
-#ifdef USE_BUCKET_REMOVED_FILTER
-#pragma omp for
-        for (size_t word_idx = 0;
-             word_idx < (window_bucket_buf_size_ + bits_in_word - 1) / bits_in_word; word_idx++) {
-            if (bucket_removed_indicator_.getWord(word_idx) != UINT32_MAX) {
-                for (auto buffer_id = word_idx * bits_in_word;
-                     buffer_id < min<size_t>((word_idx + 1) * bits_in_word, window_bucket_buf_size_); buffer_id++) {
-                    if (!bucket_removed_indicator_.get(buffer_id))
-                        updater(bucket_buf_[buffer_id], buffer_id);
-                }
-            }
-        }
-#else
 #pragma omp for
         for (auto i = 0; i < window_bucket_buf_size_; i++) {
             updater(bucket_buf_[i], i);
         }
-#endif
     }
     local_bucket_buf.submit_if_possible();
     local_queue_buf.submit_if_possible();
@@ -308,17 +243,8 @@ void IterHelper::MarkProcessed() {
     for (long i = 0; i < curr_tail_; i++) {
         eid_t e = curr_[i];
 
-#ifndef BMP_PROCESSED
-        processed_[e] = true;
-#else
         processed_.set_atomic(e);
-#endif
-
-#ifndef BMP_QUEUE
-        in_curr_[e] = false;
-#else
         in_curr_.unset_atomic(e);
-#endif
     }
 
 #pragma omp barrier
@@ -369,14 +295,6 @@ IterHelper::~IterHelper() {
     Timer free_timer;
     free(next_);
     free(curr_);
-
-#ifndef BMP_QUEUE
-    free(in_next_);
-    free(in_curr_);
-#endif
-#ifndef BMP_PROCESSED
-    free(processed_);
-#endif
 
     free(edge_offsets_level_);
     free(level_start_pos_);

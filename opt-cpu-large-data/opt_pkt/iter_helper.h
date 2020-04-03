@@ -27,11 +27,7 @@ public:
     int n_;
 
 public:
-#ifdef BMP_PROCESSED
     BoolArray<word_type> processed_;
-#else
-    bool *processed_;
-#endif
 
     // Origin Edge Offset.
     eid_t *edge_off_org_;
@@ -53,17 +49,11 @@ public:
     long next_tail_;
     eid_t *curr_;
 
-#ifdef BMP_QUEUE
     BoolArray<word_type> in_curr_;
-#else
-    bool *in_curr_;
-#endif
+
     eid_t *next_;
-#ifdef BMP_QUEUE
     BoolArray<word_type> in_next_;
-#else
-    bool *in_next_;
-#endif
+
     // For Graph Shrink.
     bool *is_vertex_updated_;
     eid_t *off_end_;
@@ -109,23 +99,11 @@ public:
 };
 
 void TriCntDetailSubLevel(graph_t *g, eid_t *curr,
-#ifndef BMP_QUEUE
-        bool *InCurr,
-#else
                           BoolArray<word_type> &InCurr,
-#endif
                           long currTail, int *EdgeSupport, int level, eid_t *next,
-#ifndef BMP_QUEUE
-        bool *InNext,
-#else
                           BoolArray<word_type> &InNext,
-#endif
                           long *nextTail,
-#ifdef BMP_PROCESSED
                           BoolArray<word_type> &processed_,
-#else
-        bool *processed_,
-#endif
                           Edge *edgeIdtoEdge, eid_t *off_end,
                           bool *is_vertex_updated, IterHelper &iter_helper, volatile eid_t &global_v_buff_size
 );

@@ -8,40 +8,6 @@
 #include "util/containers/boolarray.h"
 #include "iter_helper.h"
 
-inline int ComputeCNGallopingSingleDir(graph_t *g, uint32_t off_nei_u, uint32_t off_u_end,
-                                       uint32_t off_nei_v, uint32_t off_v_end) {
-    auto cn_count = 0;
-    if (off_u_end - off_nei_u > off_v_end - off_nei_v) {
-        swap(off_nei_u, off_nei_v);
-        swap(off_u_end, off_v_end);
-    }
-    if (off_nei_u >= off_u_end) {
-        return cn_count;
-    }
-    while (true) {
-        while (g->adj[off_nei_u] < g->adj[off_nei_v]) {
-            ++off_nei_u;
-            if (off_nei_u >= off_u_end) {
-                return cn_count;
-            }
-        }
-
-        off_nei_v = GallopingSearch(g->adj, off_nei_v, off_v_end, g->adj[off_nei_u]);
-        if (off_nei_v >= off_v_end) {
-            return cn_count;
-        }
-
-        if (g->adj[off_nei_u] == g->adj[off_nei_v]) {
-            cn_count++;
-            ++off_nei_u;
-            ++off_nei_v;
-            if (off_nei_u >= off_u_end || off_nei_v >= off_v_end) {
-                return cn_count;
-            }
-        }
-    }
-}
-
 template<typename P, typename B>
 void PackVertexIntermediate(graph_t *g, const eid_t *off_end,
                             P &partition_id_lst, B &bitmap_in_partition_lst, int u) {
@@ -87,11 +53,7 @@ inline int ComputeSupportWithPackIntermediate(graph_t *g, const eid_t *off_end, 
                                               P &partition_id_lst, B &bitmap_in_partition_lst,
                                               LocalWriteBuffer<eid_t, long> &local_write_buffer,
                                               LocalWriteBuffer<eid_t, size_t> &local_bucket_buffer,
-#ifndef BMP_QUEUE
-        bool *InNext,
-#else
                                               BoolArray<word_type> &InNext,
-#endif
                                               int level, int bucket_level_end, bool *in_bucket_window,
                                               IterHelper &iter_helper, int &last_u, int &u) {
     u = FindSrc(g, u, i);
@@ -120,11 +82,7 @@ inline int ComputeSupportWithPackIntermediate(graph_t *g, const eid_t *off_end, 
 
     auto &edge_sup_ref = EdgeSupport[eid];
 
-#ifndef BMP_QUEUE
-    assert(edge_sup_ref > level || iter_helper.in_next_[eid]);
-#else
     assert(edge_sup_ref > level || iter_helper.in_next_.get(eid));
-#endif
     if (edge_sup_ref > level) {
         if (du > dv || ((du == dv) && (u < v))) {
             if (!partition_id_lst[v].empty()) {
@@ -149,11 +107,7 @@ inline int ComputeSupportWithPackIntermediate(graph_t *g, const eid_t *off_end, 
                 if (local_cnt == level) {
                     // add to queue.
                     local_write_buffer.push(eid);
-#ifndef BMP_QUEUE
-                    InNext[eid] = true;
-#else
                     InNext.set_atomic(eid);
-#endif
                 } else if (local_cnt > level && local_cnt < bucket_level_end) {
                     // add to bucket if possible
                     bool get_token = __sync_bool_compare_and_swap(&in_bucket_window[eid], false, true);

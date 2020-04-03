@@ -129,8 +129,3 @@ inline int ComputeSupportWithPack(graph_t *g, int *EdgeSupport, size_t &tc_cnt, 
     }
     return local_cnt;
 }
-
-// ru < rv, u points to v
-inline bool less_than(int u, int v, int du, int dv) {
-    return du > dv || ((du == dv) && (u < v));
-}
