@@ -24,9 +24,6 @@ public:
 public:
     BoolArray<word_type> processed_;
 
-    // Origin Edge Offset.
-    int level_size_;
-
     // Bucket Related.
     BoolArray<word_type> bucket_removed_indicator_;
     int bucket_level_end_ = 0;
@@ -120,9 +117,6 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
 
 #pragma omp parallel
     {
-        size_t acc_process_num = 0;
-        double acc_time = 0;
-
         // TC.
         IterStatTLS iter_stat_tls;
         iter_helper.ComputeTriSupport(iter_stat_tls);
@@ -150,8 +144,12 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
             iter_helper.SCANGraph(level);
             iter_stat_tls.RecordSCANTime();
 
+            size_t sub_level = 0;
+
             // 3rd: Processing the graph (shrinking and updating supports).
             while (iter_helper.curr_tail_ > 0) {
+#pragma omp single
+                log_info("Level: %d, beg sub-level: %d", level, sub_level);
                 // Map the curr_ to result array.
                 todo = todo - iter_helper.curr_tail_;
                 iter_stat_tls.RecordQueueSize(iter_helper.curr_tail_);
@@ -164,6 +162,8 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
 
                 // 3.1: Optional shrinking graph. (Move to here to maximally shrink the graph).
                 if (acc_deleted > numEdges / graph_compaction_threshold) {
+#pragma omp single
+                    log_info("Shrink Graph!!!!!!!!!!!!");
 #pragma omp barrier
                     Timer shrink_timer;
                     iter_helper.ShrinkCSREID(&global_v_buff_size, local_buffer);
@@ -185,11 +185,9 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
                     size_t left_edge_size = todo;
                     double estimated_tc_time = left_edge_size / (g->m / 2.0) * init_tc_time + penalty_tc_time;
                     double estimated_peel_time = task_size / estimated_process_throughput;
-
                     if (estimated_tc_time > estimated_peel_time) {
                         auto to_delete = iter_helper.curr_tail_;
                         f(level);
-                        acc_process_num += task_size;
                         acc_deleted += to_delete;
                     } else {
 #pragma omp single
@@ -228,6 +226,9 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
                 }
 #pragma omp barrier
                 iter_stat_tls.RecordProcessTime();
+#pragma omp single
+                log_info("Level: %d, Finish sub-level: %d", level, sub_level);
+                sub_level++;
             }
             level = level + 1;
 #pragma omp barrier
@@ -237,8 +238,7 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
         // The end.
 #pragma omp single
         {
-            iter_helper.level_size_ = level;
-            log_info("Total Levels: %d", iter_helper.level_size_);
+            log_info("Total Levels: %d", level);
             log_trace("Last Level Finished: %d, Elapsed Time: %.9lfs, Left/Total: %'lld/%'lld, "
                       "Local/Global-Iter#: %zu/%zu", level - 1,
                       iter_timer.elapsed_and_reset(), todo, numEdges, local_iter_num, iter_num);

@@ -20,8 +20,8 @@ OFF LinearSearch(T *array, OFF offset_beg, OFF offset_end, T val) {
 
 template<typename T, typename OFF>
 OFF BranchFreeBinarySearch(T *a, OFF offset_beg, OFF offset_end, T x) {
-    int32_t n = offset_end - offset_beg;
     using I = OFF;
+    I n = offset_end - offset_beg;
     const T *base = a + offset_beg;
     while (n > 1) {
         I half = n / 2;

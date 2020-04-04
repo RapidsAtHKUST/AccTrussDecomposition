@@ -20,8 +20,6 @@ IterHelper::IterHelper(graph_t *g, int **edge_sup_ptr, Edge **edge_lst_ptr)
 
     log_info("Malloc Time: %.6lfs", malloc_timer.elapsed());
 
-    level_size_ = 0;
-
     is_vertex_updated_ = (bool *) malloc(n_ * sizeof(bool));
     off_end_ = (eid_t *) malloc((n_ + 1) * sizeof(eid_t));
     global_v_buffer_ = (vid_t *) malloc(n_ * sizeof(vid_t));
@@ -40,24 +38,24 @@ void IterHelper::MemSetIterVariables(int max_omp_threads) {
         omp_num_threads_ = max_omp_threads;
     }
 #pragma omp for
-    for (auto i = 0; i < max_omp_threads; i++) {
-        auto avg = n_ / max_omp_threads;
-        auto iter_beg = avg * i;
-        auto iter_end = (i == max_omp_threads - 1) ? n_ : avg * (i + 1);
+    for (size_t i = 0; i < max_omp_threads; i++) {
+        size_t avg = n_ / max_omp_threads;
+        size_t iter_beg = avg * i;
+        size_t iter_end = (i == max_omp_threads - 1) ? n_ : avg * (i + 1);
         memset(is_vertex_updated_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(bool));
     }
 #pragma omp for
-    for (auto i = 0; i < max_omp_threads; i++) {
-        auto avg = (n_ + 1) / max_omp_threads;
-        auto iter_beg = avg * i;
-        auto iter_end = (i == max_omp_threads - 1) ? (n_ + 1) : avg * (i + 1);
+    for (size_t i = 0; i < max_omp_threads; i++) {
+        size_t avg = (n_ + 1) / max_omp_threads;
+        size_t iter_beg = avg * i;
+        size_t iter_end = (i == max_omp_threads - 1) ? (n_ + 1) : avg * (i + 1);
         memcpy(off_end_ + iter_beg, g->num_edges + iter_beg, sizeof(eid_t) * (iter_end - iter_beg));
     }
 #pragma omp for
-    for (auto i = 0; i < max_omp_threads; i++) {
-        auto avg = num_edges_ / max_omp_threads;
-        auto iter_beg = avg * i;
-        auto iter_end = (i == max_omp_threads - 1) ? num_edges_ : avg * (i + 1);
+    for (size_t i = 0; i < max_omp_threads; i++) {
+        size_t avg = num_edges_ / max_omp_threads;
+        size_t iter_beg = avg * i;
+        size_t iter_end = (i == max_omp_threads - 1) ? num_edges_ : avg * (i + 1);
         memset(in_bucket_window_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(bool));
         memset(bucket_buf_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(eid_t));
     }

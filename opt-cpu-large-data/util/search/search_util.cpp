@@ -27,9 +27,9 @@ size_t LinearSearchAVX2(int *array, size_t offset_beg, size_t offset_end, int va
 
 size_t BinarySearchForGallopingSearchAVX2(const int *array, size_t offset_beg, size_t offset_end, int val) {
     while (offset_end - offset_beg >= 16) {
-        auto mid = static_cast<uint32_t>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
-        _mm_prefetch((char *) &array[(static_cast<unsigned long>(mid + 1) + offset_end) / 2], _MM_HINT_T0);
-        _mm_prefetch((char *) &array[(static_cast<unsigned long>(offset_beg) + mid) / 2], _MM_HINT_T0);
+        size_t mid = (offset_beg + offset_end) / 2;
+        _mm_prefetch((char *) &array[(mid + 1 + offset_end) / 2], _MM_HINT_T0);
+        _mm_prefetch((char *) &array[(offset_beg + mid) / 2], _MM_HINT_T0);
         if (array[mid] == val) {
             return mid;
         } else if (array[mid] < val) {
@@ -124,9 +124,9 @@ size_t LinearSearchAVX512(int *array, size_t offset_beg, size_t offset_end, int 
 
 size_t BinarySearchForGallopingSearchAVX512(const int *array, size_t offset_beg, size_t offset_end, int val) {
     while (offset_end - offset_beg >= 32) {
-        auto mid = static_cast<uint32_t>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
-        _mm_prefetch((char *) &array[(static_cast<unsigned long>(mid + 1) + offset_end) / 2], _MM_HINT_T0);
-        _mm_prefetch((char *) &array[(static_cast<unsigned long>(offset_beg) + mid) / 2], _MM_HINT_T0);
+        size_t mid = (offset_beg + offset_end) / 2;
+        _mm_prefetch((char *) &array[(mid + 1 + offset_end) / 2], _MM_HINT_T0);
+        _mm_prefetch((char *) &array[(offset_beg + mid) / 2], _MM_HINT_T0);
         if (array[mid] == val) {
             return mid;
         } else if (array[mid] < val) {
@@ -177,11 +177,6 @@ size_t GallopingSearchAVX512(int *array, size_t offset_beg, size_t offset_end, i
 
     // galloping
     auto jump_idx = 16u;
-    // pre-fetch
-//    auto jump_times = 32 - _lzcnt_u32((offset_end - offset_beg) >> 4);
-//    __m512i prefetch_idx = _mm512_set_epi64(16, 32, 64, 128, 256, 512, 1024, 2048);
-//    __mmask8 mask = jump_times >= 8 ? (__mmask8) 0xff : (__mmask8) 0xff << (8 - jump_times);
-//    _mm512_mask_prefetch_i64gather_ps(prefetch_idx, mask, array + offset_beg, 1, _MM_HINT_T0);
 
     while (true) {
         auto peek_idx = offset_beg + jump_idx;

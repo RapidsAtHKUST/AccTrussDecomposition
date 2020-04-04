@@ -53,6 +53,9 @@ void PKT_processSubLevel_intersection_handling_skew(graph_t *g, eid_t *curr,
         size_t beg = 0;
         if (uEnd - uStart > 0 && vEnd - vStart > 0) {
             SetInterSectionLookup(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
+            if (beg >= 1024 * 1024) {
+                log_fatal("error: beg: %d > 1024*1024", beg);
+            }
             for (auto iter = 0u; iter < beg; iter++) {
                 std::tie(off_nei_v, off_nei_u) = intersection_res[iter];
                 eid_t e2 = g->eid[off_nei_v];  //<v,w>

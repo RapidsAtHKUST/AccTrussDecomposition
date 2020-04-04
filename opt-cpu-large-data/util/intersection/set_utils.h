@@ -262,6 +262,7 @@ inline void SetIntersectionMergeAVX2(graph_t *g, eid_t off_nei_u, eid_t uEnd, ei
 
 #ifndef U16_HELPER
 #define U16_HELPER
+
 inline std::uint16_t operator "" _u(unsigned long long value) {
     return static_cast<std::uint16_t>(value);
 }
@@ -323,13 +324,6 @@ inline void SetInterMergeAVX512DetailFourFour(graph_t *g, eid_t &off_nei_u, eid_
                 tmp = (mask >> (4 * 3)) & 0xf_u;
                 if (tmp) { intersection_res[beg++] = make_pair(off_nei_u + 3, off_nei_v + lookup_dict2[tmp]); }
             }
-// TODO: vectorize this part.
-//                for (auto i = 0; i < 4; i++) {
-//                    auto tmp = (mask >> (4 * i)) & 0xf_u;
-//                    if (tmp) {
-//                        intersection_res[beg++] = make_pair(off_nei_u + i, off_nei_v + lookup_dict2[tmp]);
-//                    }
-//                }
             if (g->adj[off_nei_u + 3] > g->adj[off_nei_v + 3]) {
                 off_nei_v += 4;
                 if (off_nei_v + 3 >= vEnd) {
@@ -384,10 +378,6 @@ inline void SetIntersectionMergeAVX512(graph_t *g, eid_t off_nei_u, eid_t uEnd, 
 
 #endif
 
-#if (defined(__AVX512F__) || defined(__AVX2__) || defined(__SSE4_1__)) && (defined(ENABLE_AVX2))
-#define ENABLE_VEC
-#endif
-
 inline void SetInterSectionLookup(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t off_nei_v, eid_t vEnd,
                                   vector<pair<eid_t, eid_t >> &intersection_res, size_t &beg) {
     if (uEnd - off_nei_u > vEnd - off_nei_v) {
@@ -395,7 +385,6 @@ inline void SetInterSectionLookup(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t
         swap(off_nei_u, off_nei_v);
     }
     beg = 0;
-#if defined(ENABLE_VEC)
     if ((uEnd - off_nei_u) * 50 > (vEnd - off_nei_v)) {
 #if defined(__AVX512F__)
         SetIntersectionMergeAVX512Detail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
@@ -405,7 +394,6 @@ inline void SetInterSectionLookup(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t
         SetIntersectionMergeSSE4Detail(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);
 #endif
     } else {
-#endif
         while (true) {
 #ifdef __AVX512F__
             off_nei_u = LinearSearchAVX512(g->adj, off_nei_u, uEnd, g->adj[off_nei_v]);
@@ -417,7 +405,7 @@ inline void SetInterSectionLookup(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t
             }
 #ifdef __AVX512F__
             off_nei_v = GallopingSearchAVX512(g->adj, off_nei_v, vEnd, g->adj[off_nei_u]);
-#elif defined(__AVX2__) && defined(ENABLE_AVX2)
+#elif defined(__AVX2__)
             off_nei_v = GallopingSearchAVX2(g->adj, off_nei_v, vEnd, g->adj[off_nei_u]);
 #else
             off_nei_v = GallopingSearch(g->adj, off_nei_v, vEnd, g->adj[off_nei_u]);
@@ -434,99 +422,5 @@ inline void SetInterSectionLookup(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t
                 }
             }
         }
-#if defined(ENABLE_VEC)
     }
-#endif
-}
-
-// Assume `intersection_res` is large enough
-inline void SetIntersection(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t off_nei_v, eid_t vEnd,
-                            vector<pair<eid_t, eid_t >> &intersection_res, size_t &beg) {
-    beg = 0;
-#ifdef NAIVE_INTER
-    unsigned int numElements = (uEnd - off_nei_u) + (vEnd - off_nei_v);
-    for (unsigned int innerIdx = 0; innerIdx < numElements; innerIdx++) {
-        if (off_nei_u >= uEnd) {
-            break;
-        } else if (off_nei_v >= vEnd) {
-            break;
-        } else if (g->adj[off_nei_u] == g->adj[off_nei_v]) {
-            intersection_res[beg++] = make_pair(off_nei_v, off_nei_u);
-            off_nei_u++;
-            off_nei_v++;
-        } else if (g->adj[off_nei_u] < g->adj[off_nei_v]) {
-            off_nei_u++;
-        } else if (g->adj[off_nei_v] < g->adj[off_nei_u]) {
-            off_nei_v++;
-        }
-    }
-#else
-    while (true) {
-#if defined(__AVX2__) && defined(ENABLE_AVX2)
-        off_nei_u = GallopingSearchAVX2(g->adj, off_nei_u, uEnd, g->adj[off_nei_v]);
-#else
-        off_nei_u = GallopingSearch(g->adj, off_nei_u, uEnd, g->adj[off_nei_v]);
-#endif
-        if (off_nei_u >= uEnd) {
-            break;
-        }
-#if defined(__AVX2__) && defined(ENABLE_AVX2)
-        off_nei_v = GallopingSearchAVX2(g->adj, off_nei_v, vEnd, g->adj[off_nei_u]);
-#else
-        off_nei_v = GallopingSearch(g->adj, off_nei_v, vEnd, g->adj[off_nei_u]);
-#endif
-        if (off_nei_v >= vEnd) {
-            break;
-        }
-        if (g->adj[off_nei_u] == g->adj[off_nei_v]) {
-            intersection_res[beg++] = make_pair(off_nei_v, off_nei_u);
-            ++off_nei_u;
-            ++off_nei_v;
-            if (off_nei_u >= uEnd || off_nei_v >= vEnd) {
-                break;
-            }
-        }
-    }
-#endif
-}
-
-inline void SetIntersection(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t off_nei_v, eid_t vEnd,
-                            vector<pair<eid_t, eid_t >> &intersection_res) {
-#ifdef NAIVE_INTER
-    unsigned int numElements = (uEnd - off_nei_u) + (vEnd - off_nei_v);
-    for (unsigned int innerIdx = 0; innerIdx < numElements; innerIdx++) {
-        if (off_nei_u >= uEnd) {
-            break;
-        } else if (off_nei_v >= vEnd) {
-            break;
-        } else if (g->adj[off_nei_u] == g->adj[off_nei_v]) {
-            intersection_res.emplace_back(off_nei_v, off_nei_u);
-            off_nei_u++;
-            off_nei_v++;
-        } else if (g->adj[off_nei_u] < g->adj[off_nei_v]) {
-            off_nei_u++;
-        } else if (g->adj[off_nei_v] < g->adj[off_nei_u]) {
-            off_nei_v++;
-        }
-    }
-#else
-    while (true) {
-        off_nei_u = GallopingSearch(g->adj, off_nei_u, uEnd, g->adj[off_nei_v]);
-        if (off_nei_u >= uEnd) {
-            break;
-        }
-        off_nei_v = GallopingSearch(g->adj, off_nei_v, vEnd, g->adj[off_nei_u]);
-        if (off_nei_v >= vEnd) {
-            break;
-        }
-        if (g->adj[off_nei_u] == g->adj[off_nei_v]) {
-            intersection_res.emplace_back(off_nei_v, off_nei_u);
-            ++off_nei_u;
-            ++off_nei_v;
-            if (off_nei_u >= uEnd || off_nei_v >= vEnd) {
-                break;
-            }
-        }
-    }
-#endif
 }
