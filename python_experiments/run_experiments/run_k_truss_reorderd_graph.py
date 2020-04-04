@@ -40,7 +40,7 @@ def run_exp(env_tag=knl_tag, with_c_group=True, data_path_tag=k_truss_exec_path_
     ]
     # thread_num_lst = [1, 2, 4, 8, 16, 32, 40, 56]
     # thread_num_lst = [64] if env_tag is gpu24_tag else [40]
-    thread_num_lst = [60] if env_tag is gpu24_tag else [40]
+    thread_num_lst = [56, 60, 64] if env_tag is gpu24_tag else [40]
 
     exp_res_root_name = 'exp_results'
     folder_name = 'exp-2020-04-03-less-than-4G-edges' + os.sep + hostname
@@ -144,7 +144,7 @@ def run_exp(env_tag=knl_tag, with_c_group=True, data_path_tag=k_truss_exec_path_
 
                         logger.info('finish: {}'.format(cmd))
 
-    for _ in range(1):
+    for _ in range(5):
         one_round()
 
 

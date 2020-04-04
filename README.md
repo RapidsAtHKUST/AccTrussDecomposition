@@ -17,6 +17,7 @@ Algorithm | Abbreviation | Code Folder |
 --- | --- | --- 
 Our Optimized TD | OPT-CPU | [opt-truss-decomp](opt-truss-decomp)
 Our Optimized TD with GPU | OPT-HPU | [opt-truss-decomp-offload](opt-truss-decomp-offload)
+Our simplified OPT-CPU with Large Data support `> 2G edges` | OPT-CPU-LD | [opt-cpu-large-data](opt-cpu-large-data) 
 Wang et al.'s work (VLDB'12) | WC (sequential) | [opt-truss-decomp/related_work/wc_improved.cpp](opt-truss-decomp/related_work/wc_improved.cpp) 
 Ross et al.'s work (PKDD'14) | ROSS (sequential) | [opt-truss-decomp/related_work/ros_improved.cpp](opt-truss-decomp/related_work/ros_improved.cpp)
 Kabir et al.'s work (HiPC'17, HPEC'17) | PKT | [opt-truss-decomp/pkt_serial](opt-truss-decomp/pkt_serial), [opt-truss-decomp/pkt_parallel_org](opt-truss-decomp/pkt_parallel_org)
