@@ -16,13 +16,8 @@
 
 class IterHelper {
 public:
-    vector<uint32_t> histogram_;
-    int omp_num_threads_;
     graph_t *g;
-    eid_t *compact_num_edges_;
-    vid_t *compact_adj_;
-    eid_t *compact_eid_;
-
+    int omp_num_threads_;
     size_t num_edges_;  // num_edges_ is changed during the shrinking.
     int n_;
 
@@ -30,9 +25,6 @@ public:
     BoolArray<word_type> processed_;
 
     // Origin Edge Offset.
-    eid_t *edge_off_org_;
-    eid_t *level_start_pos_;
-    eid_t *edge_offsets_level_;
     int level_size_;
 
     // Bucket Related.
@@ -63,14 +55,6 @@ public:
     int **edge_sup_ptr_;
     Edge **edge_lst_ptr_;
 
-    // Shrink Related Extra Memory.
-    eid_t *edge_off_org_shrink_;
-    int *edge_support_shrink_;
-    Edge *edge_lst_shrink_;
-    eid_t *bucket_buf_shrink_;
-
-    uint32_t *edge_lst_relative_off_; // // prefix-sum inclusive
-    uint32_t *bucket_relative_off_; // prefix-sum inclusive
 public:
     // BSR.
     vector<vector<int>> partition_id_lst;

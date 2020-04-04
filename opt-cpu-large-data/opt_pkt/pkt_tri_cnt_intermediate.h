@@ -48,7 +48,7 @@ void PackVertexIntermediate(graph_t *g, const eid_t *off_end,
 }
 
 template<typename P, typename B>
-inline int ComputeSupportWithPackIntermediate(graph_t *g, const eid_t *off_end, int *EdgeSupport, uint32_t i,
+inline int ComputeSupportWithPackIntermediate(graph_t *g, const eid_t *off_end, int *EdgeSupport, eid_t i,
                                               BoolArray<bmp_word_type> &bool_arr,
                                               P &partition_id_lst, B &bitmap_in_partition_lst,
                                               LocalWriteBuffer<eid_t, long> &local_write_buffer,
@@ -86,7 +86,7 @@ inline int ComputeSupportWithPackIntermediate(graph_t *g, const eid_t *off_end, 
     if (edge_sup_ref > level) {
         if (du > dv || ((du == dv) && (u < v))) {
             if (!partition_id_lst[v].empty()) {
-                for (auto wi = 0u; wi < partition_id_lst[v].size(); wi++) {
+                for (eid_t wi = 0u; wi < partition_id_lst[v].size(); wi++) {
                     auto res = bool_arr.getWord(partition_id_lst[v][wi]) & bitmap_in_partition_lst[v][wi];
                     local_cnt += popcnt(&res, sizeof(bmp_word_type));
                 }

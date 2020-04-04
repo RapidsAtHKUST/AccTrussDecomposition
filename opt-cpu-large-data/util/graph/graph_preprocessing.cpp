@@ -27,7 +27,7 @@ void getEidAndEdgeList(graph_t *g, Edge *idToEdge) {
 
     num_edges_copy[0] = 0;
     auto num_threads = omp_get_max_threads();
-    vector<uint32_t> histogram(CACHE_LINE_ENTRY * num_threads);
+    vector<eid_t> histogram(CACHE_LINE_ENTRY * num_threads);
 #pragma omp parallel
     {
 #pragma omp for

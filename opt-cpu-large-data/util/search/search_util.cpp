@@ -4,7 +4,7 @@
 
 #ifdef __AVX2__
 
-uint32_t LinearSearchAVX2(int *array, uint32_t offset_beg, uint32_t offset_end, int val) {
+size_t LinearSearchAVX2(int *array, size_t offset_beg, size_t offset_end, int val) {
     // linear search fallback
     __m256i pivot_element = _mm256_set1_epi32(val);
     for (; offset_beg + 8 < offset_end; offset_beg += 8) {
@@ -25,7 +25,7 @@ uint32_t LinearSearchAVX2(int *array, uint32_t offset_beg, uint32_t offset_end, 
     return offset_end;
 }
 
-uint32_t BinarySearchForGallopingSearchAVX2(const int *array, uint32_t offset_beg, uint32_t offset_end, int val) {
+size_t BinarySearchForGallopingSearchAVX2(const int *array, size_t offset_beg, size_t offset_end, int val) {
     while (offset_end - offset_beg >= 16) {
         auto mid = static_cast<uint32_t>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
         _mm_prefetch((char *) &array[(static_cast<unsigned long>(mid + 1) + offset_end) / 2], _MM_HINT_T0);
@@ -60,7 +60,7 @@ uint32_t BinarySearchForGallopingSearchAVX2(const int *array, uint32_t offset_be
 }
 
 // Assuming size > 0
-uint32_t GallopingSearchAVX2(int *array, uint32_t offset_beg, uint32_t offset_end, int val) {
+size_t GallopingSearchAVX2(int *array, size_t offset_beg, size_t offset_end, int val) {
 // Not necessary because of the linear search.
 //    if (array[offset_end - 1] < val) {
 //        return offset_end;
@@ -103,7 +103,7 @@ uint32_t GallopingSearchAVX2(int *array, uint32_t offset_beg, uint32_t offset_en
 
 #ifdef __AVX512F__
 
-uint32_t LinearSearchAVX512(int *array, uint32_t offset_beg, uint32_t offset_end, int val) {
+size_t LinearSearchAVX512(int *array, size_t offset_beg, size_t offset_end, int val) {
     constexpr int parallelism = 16;
     __m512i pivot_element = _mm512_set1_epi32(val);
     for (; offset_beg + 15 < offset_end; offset_beg += parallelism) {
@@ -122,7 +122,7 @@ uint32_t LinearSearchAVX512(int *array, uint32_t offset_beg, uint32_t offset_end
     return offset_end;
 }
 
-uint32_t BinarySearchForGallopingSearchAVX512(const int *array, uint32_t offset_beg, uint32_t offset_end, int val) {
+size_t BinarySearchForGallopingSearchAVX512(const int *array, size_t offset_beg, size_t offset_end, int val) {
     while (offset_end - offset_beg >= 32) {
         auto mid = static_cast<uint32_t>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
         _mm_prefetch((char *) &array[(static_cast<unsigned long>(mid + 1) + offset_end) / 2], _MM_HINT_T0);
@@ -155,7 +155,7 @@ uint32_t BinarySearchForGallopingSearchAVX512(const int *array, uint32_t offset_
     return offset_end;
 }
 
-uint32_t GallopingSearchAVX512(int *array, uint32_t offset_beg, uint32_t offset_end, int val) {
+size_t GallopingSearchAVX512(int *array, size_t offset_beg, size_t offset_end, int val) {
     if (array[offset_end - 1] < val) {
         return offset_end;
     }

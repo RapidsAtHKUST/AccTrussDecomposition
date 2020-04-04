@@ -21,30 +21,10 @@ IterHelper::IterHelper(graph_t *g, int **edge_sup_ptr, Edge **edge_lst_ptr)
     log_info("Malloc Time: %.6lfs", malloc_timer.elapsed());
 
     level_size_ = 0;
-    edge_off_org_ = (eid_t *) malloc(num_edges_ * sizeof(eid_t));
-    level_start_pos_ = (eid_t *) calloc(MAX_LEVEL, sizeof(eid_t));
-    edge_offsets_level_ = (eid_t *) malloc(num_edges_ * sizeof(eid_t));
-    log_info("Malloc Time (Edge Off/ Level CSR): %.6lfs", malloc_timer.elapsed());
 
     is_vertex_updated_ = (bool *) malloc(n_ * sizeof(bool));
     off_end_ = (eid_t *) malloc((n_ + 1) * sizeof(eid_t));
     global_v_buffer_ = (vid_t *) malloc(n_ * sizeof(vid_t));
-
-    // Compact Graph Related
-    compact_num_edges_ = (eid_t *) malloc((g->n + 1) * sizeof(eid_t));
-    compact_num_edges_[0] = 0;
-    compact_adj_ = (vid_t *) malloc(2 * num_edges_ * sizeof(vid_t));
-    compact_eid_ = (eid_t *) malloc(2 * num_edges_ * sizeof(eid_t));
-
-    // Shrinking Graph Related.
-    edge_off_org_shrink_ = (eid_t *) malloc(num_edges_ * sizeof(eid_t));
-    edge_support_shrink_ = (int *) malloc(num_edges_ * sizeof(int));
-    edge_lst_shrink_ = (Edge *) malloc(num_edges_ * sizeof(Edge));
-    bucket_buf_shrink_ = (eid_t *) malloc(num_edges_ * sizeof(eid_t));
-
-    bucket_relative_off_ = (uint32_t *) malloc((num_edges_) * sizeof(uint32_t));
-    edge_lst_relative_off_ = (uint32_t *) malloc((num_edges_) * sizeof(uint32_t));
-    log_info("Malloc Time (For Shrinking Graph): %.6lfs", malloc_timer.elapsed());
 
     partition_id_lst = vector<vector<int >>(g->n);
     bitmap_in_partition_lst = vector<vector<bmp_word_type >>(g->n);
@@ -57,7 +37,6 @@ IterHelper::IterHelper(graph_t *g, int **edge_sup_ptr, Edge **edge_lst_ptr)
 void IterHelper::MemSetIterVariables(int max_omp_threads) {
 #pragma omp single
     {
-        histogram_ = vector<uint32_t>((max_omp_threads + 1) * CACHE_LINE_ENTRY, 0);
         omp_num_threads_ = max_omp_threads;
     }
 #pragma omp for
@@ -105,7 +84,7 @@ void IterHelper::ComputeTriSupport(IterStatTLS &iter_stat_tls) {
     // Triangle-Counting With Packing Index.
     auto bool_arr = BoolArray<bmp_word_type>(g->n);
 #pragma omp for schedule(dynamic, 6000) reduction(+:tc_cnt)
-    for (auto i = 0u; i < g->m; i++)
+    for (eid_t i = 0u; i < g->m; i++)
         ComputeSupportWithPack(g, EdgeSupport, tc_cnt, i, bool_arr,
                                partition_id_lst, bitmap_in_partition_lst);
 #pragma omp single
@@ -142,7 +121,7 @@ void IterHelper::ShrinkCSREID(volatile eid_t *global_buffer_size, vid_t *local_b
     // Assume global_buffer_size is volatile, visible to other threads.
     auto active_vertex_size = *global_buffer_size;
 #pragma omp for schedule(dynamic, 600)
-    for (auto idx = 0u; idx < active_vertex_size; idx++) {
+    for (eid_t idx = 0u; idx < active_vertex_size; idx++) {
         auto u = global_v_buffer_[idx];
         auto write_idx = g->num_edges[u];
         for (auto i = g->num_edges[u]; i < off_end_[u + 1]; i++) {
@@ -255,12 +234,12 @@ void IterHelper::FreeBSR() {
 
     auto mem_size = getValue();
 #pragma omp for
-    for (auto i = 0u; i < bitmap_in_partition_lst.size(); i++) {
+    for (size_t i = 0u; i < bitmap_in_partition_lst.size(); i++) {
         auto tmp = vector<bmp_word_type>();
         bitmap_in_partition_lst[i].swap(tmp);
     }
 #pragma omp for
-    for (auto i = 0u; i < partition_id_lst.size(); i++) {
+    for (size_t i = 0u; i < partition_id_lst.size(); i++) {
         auto tmp = vector<int>();
         partition_id_lst[i].swap(tmp);
     }
@@ -296,24 +275,6 @@ IterHelper::~IterHelper() {
     free(next_);
     free(curr_);
 
-    free(edge_offsets_level_);
-    free(level_start_pos_);
-    free(edge_off_org_);
-
-    // Compact
-    free(compact_num_edges_);
-    free(compact_eid_);
-    free(compact_adj_);
-
-    // Shrinking Edge List Related.
-    free(bucket_buf_shrink_);
-    free(edge_lst_shrink_);
-    free(edge_off_org_shrink_);
-    free(edge_support_shrink_);
-
-    free(bucket_relative_off_);
-    free(edge_lst_relative_off_);
-
     free(global_v_buffer_);
     free(is_vertex_updated_);
     free(off_end_);
@@ -337,8 +298,6 @@ void IterHelper::ProcessSupportZeros() {
         Edge edge = edgeIdtoEdge[e1];
         vid_t u = edge.u;
         vid_t v = edge.v;
-        eid_t uStart = g->num_edges[u], uEnd = off_end_[u + 1];
-        eid_t vStart = g->num_edges[v], vEnd = off_end_[v + 1];
 
         is_vertex_updated_[u] = true;
         is_vertex_updated_[v] = true;

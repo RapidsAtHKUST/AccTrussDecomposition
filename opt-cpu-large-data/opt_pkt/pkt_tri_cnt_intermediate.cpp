@@ -54,7 +54,7 @@ void TriCntDetailSubLevel(graph_t *g, eid_t *curr,
 
     // 4th: ComputeSupport.
 #pragma omp for schedule(dynamic, 6000)
-    for (auto i = 0u; i < g->num_edges[g->n]; i++)
+    for (eid_t i = 0u; i < g->num_edges[g->n]; i++)
         ComputeSupportWithPackIntermediate(g, off_end, *iter_helper.edge_sup_ptr_, i, bool_arr,
                                            iter_helper.partition_id_lst, iter_helper.bitmap_in_partition_lst,
                                            local_write_buffer, local_bucket_buf, InNext, level,

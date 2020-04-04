@@ -7,8 +7,8 @@
 #include "util/jetbrains_fake.h"
 #include "util/log/log.h"
 
-template<typename T>
-uint32_t LinearSearch(T *array, uint32_t offset_beg, uint32_t offset_end, T val) {
+template<typename T, typename OFF>
+OFF LinearSearch(T *array, OFF offset_beg, OFF offset_end, T val) {
     // linear search fallback
     for (auto offset = offset_beg; offset < offset_end; offset++) {
         if (array[offset] >= val) {
@@ -18,10 +18,10 @@ uint32_t LinearSearch(T *array, uint32_t offset_beg, uint32_t offset_end, T val)
     return offset_end;
 }
 
-template<typename T>
-uint32_t BranchFreeBinarySearch(T *a, uint32_t offset_beg, uint32_t offset_end, T x) {
+template<typename T, typename OFF>
+OFF BranchFreeBinarySearch(T *a, OFF offset_beg, OFF offset_end, T x) {
     int32_t n = offset_end - offset_beg;
-    using I = uint32_t;
+    using I = OFF;
     const T *base = a + offset_beg;
     while (n > 1) {
         I half = n / 2;
@@ -34,10 +34,10 @@ uint32_t BranchFreeBinarySearch(T *a, uint32_t offset_beg, uint32_t offset_end, 
 }
 
 // require sizeof(T) to be 4
-template<typename T>
-uint32_t BinarySearchForGallopingSearch(const T *array, uint32_t offset_beg, uint32_t offset_end, T val) {
+template<typename T, typename OFF>
+OFF BinarySearchForGallopingSearch(const T *array, OFF offset_beg, OFF offset_end, T val) {
     while (offset_end - offset_beg >= 32) {
-        auto mid = static_cast<uint32_t>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
+        auto mid = static_cast<OFF>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
         _mm_prefetch((char *) &array[(static_cast<unsigned long>(mid + 1) + offset_end) / 2], _MM_HINT_T0);
         _mm_prefetch((char *) &array[(static_cast<unsigned long>(offset_beg) + mid) / 2], _MM_HINT_T0);
         if (array[mid] == val) {
@@ -58,16 +58,16 @@ uint32_t BinarySearchForGallopingSearch(const T *array, uint32_t offset_beg, uin
     return offset_end;
 }
 
-template<typename T>
-bool BranchFreeBSExists(T *a, uint32_t offset_beg, uint32_t offset_end, T x) {
+template<typename T, typename OFF>
+bool BranchFreeBSExists(T *a, OFF offset_beg, OFF offset_end, T x) {
     if (offset_beg == offset_end)return false;
     auto it = BranchFreeBinarySearch(a, offset_beg, offset_end, x);
     return it != offset_end && a[it] == x;
 }
 
 // Assuming (offset_beg != offset_end)
-template<typename T>
-uint32_t GallopingSearch(T *array, uint32_t offset_beg, uint32_t offset_end, T val) {
+template<typename T, typename OFF>
+OFF GallopingSearch(T *array, OFF offset_beg, OFF offset_end, T val) {
     if (array[offset_end - 1] < val) {
         return offset_end;
     }
@@ -99,17 +99,17 @@ uint32_t GallopingSearch(T *array, uint32_t offset_beg, uint32_t offset_end, T v
 
 #ifdef __AVX2__
 
-uint32_t LinearSearchAVX2(int *array, uint32_t offset_beg, uint32_t offset_end, int val);
+size_t LinearSearchAVX2(int *array, size_t offset_beg, size_t offset_end, int val);
 
-uint32_t GallopingSearchAVX2(int *array, uint32_t offset_beg, uint32_t offset_end, int val);
+size_t GallopingSearchAVX2(int *array, size_t offset_beg, size_t offset_end, int val);
 
 #endif
 
 #ifdef __AVX512F__
 
-uint32_t LinearSearchAVX512(int *array, uint32_t offset_beg, uint32_t offset_end, int val);
+size_t LinearSearchAVX512(int *array, size_t offset_beg, size_t offset_end, int val);
 
 
-uint32_t GallopingSearchAVX512(int *array, uint32_t offset_beg, uint32_t offset_end, int val);
+size_t GallopingSearchAVX512(int *array, size_t offset_beg, size_t offset_end, int val);
 
 #endif

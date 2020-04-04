@@ -12,10 +12,10 @@
 #include "util/intersection/set_inter_cnt_utils.h"
 #include "util/containers/radix_hash_map.h"
 
-inline int FindSrc(graph_t *g, int u, uint32_t edge_idx) {
+inline int FindSrc(graph_t *g, int u, eid_t edge_idx) {
     if (edge_idx >= g->num_edges[u + 1]) {
         // update last_u, preferring galloping instead of binary search because not large range here
-        u = GallopingSearch(g->num_edges, static_cast<uint32_t>(u) + 1, g->n + 1, edge_idx);
+        u = GallopingSearch(g->num_edges, static_cast<uint32_t>(u) + 1, static_cast<uint32_t>(g->n + 1), edge_idx);
         // 1) first > , 2) has neighbor
         if (g->num_edges[u] > edge_idx) {
             while (g->num_edges[u] - g->num_edges[u - 1] == 0) { u--; }
@@ -70,7 +70,7 @@ void PackVertex(graph_t *g, P &partition_id_lst,
 }
 
 template<typename P, typename B>
-inline int ComputeSupportWithPack(graph_t *g, int *EdgeSupport, size_t &tc_cnt, uint32_t i,
+inline int ComputeSupportWithPack(graph_t *g, int *EdgeSupport, size_t &tc_cnt, eid_t i,
                                   BoolArray<bmp_word_type> &bool_arr, P &partition_id_lst,
                                   B &bitmap_in_partition_lst) {
     static thread_local auto last_u = -1;
