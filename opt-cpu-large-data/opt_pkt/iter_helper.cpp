@@ -201,7 +201,7 @@ void IterHelper::SCANGraph(int level) {
             log_info("Level: %d, Bucket Size: %'zu", level, window_bucket_buf_size_);
         }
 #pragma omp for
-        for (auto i = 0; i < window_bucket_buf_size_; i++) {
+        for (size_t i = 0; i < window_bucket_buf_size_; i++) {
             updater(bucket_buf_[i], i);
         }
     }

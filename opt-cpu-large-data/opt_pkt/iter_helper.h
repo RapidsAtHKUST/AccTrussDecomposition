@@ -145,12 +145,15 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
             iter_stat_tls.RecordSCANTime();
 
             size_t sub_level = 0;
-
+            if (iter_helper.curr_tail_ == 0 && todo > 0) {
+#pragma omp single
+                log_fatal("error... tail == 0 todo: %lld >0", todo);
+                exit(-1);
+            }
             // 3rd: Processing the graph (shrinking and updating supports).
             while (iter_helper.curr_tail_ > 0) {
 #pragma omp single
-                log_info("Level: %d, beg sub-level: %d", level, sub_level);
-                // Map the curr_ to result array.
+                log_info("Level: %d, beg sub-level: %d, Task Size: %lld", level, sub_level, iter_helper.curr_tail_);
                 todo = todo - iter_helper.curr_tail_;
                 iter_stat_tls.RecordQueueSize(iter_helper.curr_tail_);
                 // All of them being the last level.
@@ -227,7 +230,7 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
 #pragma omp barrier
                 iter_stat_tls.RecordProcessTime();
 #pragma omp single
-                log_info("Level: %d, Finish sub-level: %d", level, sub_level);
+                log_info("Level: %d, Finish sub-level: %d, Tak size: %lld", level, sub_level, iter_helper.curr_tail_);
                 sub_level++;
             }
             level = level + 1;
