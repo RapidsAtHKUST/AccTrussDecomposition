@@ -21,6 +21,7 @@ if __name__ == '__main__':
         "s26-16",
         "s27-16",
         "s28-16",
+        "s29-16"
     ]
     # folder_root = '/home/yche/mnt/luocpu9/mnt/storage1/yche/datasets'
     folder_root = '/home/yche/mnt/gpu24/mnt/nvme-ssd/yche/datasets'

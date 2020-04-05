@@ -145,11 +145,6 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
             iter_stat_tls.RecordSCANTime();
 
             size_t sub_level = 0;
-            if (iter_helper.curr_tail_ == 0 && todo > 0) {
-#pragma omp single
-                log_fatal("error... tail == 0 todo: %lld >0", todo);
-                exit(-1);
-            }
             // 3rd: Processing the graph (shrinking and updating supports).
             while (iter_helper.curr_tail_ > 0) {
 #pragma omp single

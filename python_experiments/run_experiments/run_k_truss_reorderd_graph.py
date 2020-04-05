@@ -35,15 +35,15 @@ def run_exp(env_tag=knl_tag, with_c_group=True, data_path_tag=k_truss_exec_path_
         "s25-16",
         "s26-16",
         "s27-16",
-        # "s28-16",
-        # "s29-16"
+        "s28-16",
+        "s29-16"
     ]
     # thread_num_lst = [1, 2, 4, 8, 16, 32, 40, 56]
     # thread_num_lst = [64] if env_tag is gpu24_tag else [40]
-    thread_num_lst = [56, 60, 64] if env_tag is gpu24_tag else [40]
+    thread_num_lst = [56, 60] if env_tag is gpu24_tag else [40]
 
     exp_res_root_name = 'exp_results'
-    folder_name = 'exp-2020-04-03-less-than-4G-edges' + os.sep + hostname
+    folder_name = 'exp-2020-04-04-s22-s29' + os.sep + hostname
     org_order_lst = ['org']
     our_reorder_dict = {
         'ustgpu2': org_order_lst,
@@ -69,8 +69,8 @@ def run_exp(env_tag=knl_tag, with_c_group=True, data_path_tag=k_truss_exec_path_
 
         # 'cuda-pkt-shrink-all',  # OFF-EIEP
         # 'cuda-pkt-shrink-all-opt',  # OFF-EIEP + IDX
-        'cuda-pkt-offload-opt',  # OFF-RIEP + IDX
-        'cuda-pkt-offload',  # OFF-RIEP
+        # 'cuda-pkt-offload-opt',  # OFF-RIEP + IDX
+        # 'cuda-pkt-offload',  # OFF-RIEP
     ]
     filtered_reorder_lst = our_reorder_dict[hostname]
 
@@ -144,7 +144,7 @@ def run_exp(env_tag=knl_tag, with_c_group=True, data_path_tag=k_truss_exec_path_
 
                         logger.info('finish: {}'.format(cmd))
 
-    for _ in range(5):
+    for _ in range(1):
         one_round()
 
 
