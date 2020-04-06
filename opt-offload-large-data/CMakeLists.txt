@@ -93,9 +93,9 @@ if (CUDA_FOUND)
     ######## CUDA Helper Related Build. #################
 
     ######## CPU Related Build. #################
-    add_library(pkt-cpu host/iter_helper.cpp host/extern_variables.cpp
-            host/pkt_merge.cpp host/pkt_tri_cnt_intermediate.cpp util/search/search_util.cpp
-            util/graph/graph.cpp util/stat.cpp util/log/log.cpp util/md5.cpp)
+    add_library(pkt-cpu opt_pkt/iter_helper.cpp opt_pkt/extern_variables.cpp
+            opt_pkt/pkt_merge.cpp opt_pkt/pkt_tri_cnt_intermediate.cpp util/search/search_util.cpp
+            util/graph/graph.cpp util/graph/graph_preprocessing.cpp util/stat.cpp util/log/log.cpp util/md5.cpp)
     if (SWITCH_EDGE_NUM)
         target_compile_definitions(pkt-cpu PRIVATE SWITCH_EDGE_NUM=${SWITCH_EDGE_NUM})
         message("SWITCH_EDGE_NUM:${SWITCH_EDGE_NUM}")

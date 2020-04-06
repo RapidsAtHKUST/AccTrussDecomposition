@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     graph_t g;
 
     //load the graph from file
-    Graph yche_graph(argv[1]);
+    Graph<eid_t> yche_graph(argv[1]);
     g.adj = yche_graph.edge_dst;
     g.num_edges = yche_graph.node_off;
     g.n = yche_graph.nodemax;

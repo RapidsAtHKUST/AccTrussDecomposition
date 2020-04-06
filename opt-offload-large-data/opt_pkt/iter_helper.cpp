@@ -8,26 +8,14 @@
 
 IterHelper::IterHelper(graph_t *g, int **edge_sup_ptr, Edge **edge_lst_ptr)
         : g(g), num_edges_(g->m / 2), n_(g->n),
-#ifdef BMP_PROCESSED
           processed_(num_edges_),
-#endif
           bucket_removed_indicator_(num_edges_),
-          curr_tail_(0), next_tail_(0)
-#ifdef BMP_QUEUE
-        , in_curr_(num_edges_), in_next_(num_edges_)
-#endif
-        , edge_sup_ptr_(edge_sup_ptr), edge_lst_ptr_(edge_lst_ptr) {
+          curr_tail_(0), next_tail_(0), in_curr_(num_edges_), in_next_(num_edges_), edge_sup_ptr_(edge_sup_ptr),
+          edge_lst_ptr_(edge_lst_ptr) {
     Timer malloc_timer;
-#ifndef BMP_PROCESSED
-    processed_ = (bool *) malloc(num_edges_ * sizeof(bool));
-#endif
     curr_ = (eid_t *) malloc(num_edges_ * sizeof(eid_t));
     next_ = (eid_t *) malloc(num_edges_ * sizeof(eid_t));
 
-#ifndef BMP_QUEUE
-    in_curr_ = (bool *) malloc(num_edges_ * sizeof(bool));
-    in_next_ = (bool *) malloc(num_edges_ * sizeof(bool));
-#endif
     log_info("Malloc Time: %.6lfs", malloc_timer.elapsed());
 
     level_size_ = 0;
@@ -52,12 +40,12 @@ IterHelper::IterHelper(graph_t *g, int **edge_sup_ptr, Edge **edge_lst_ptr)
     edge_lst_shrink_ = (Edge *) malloc(num_edges_ * sizeof(Edge));
     bucket_buf_shrink_ = (eid_t *) malloc(num_edges_ * sizeof(eid_t));
 
-    bucket_relative_off_ = (uint32_t *) malloc((num_edges_) * sizeof(uint32_t));
-    edge_lst_relative_off_ = (uint32_t *) malloc((num_edges_) * sizeof(uint32_t));
+    bucket_relative_off_ = (eid_t *) malloc((num_edges_) * sizeof(eid_t));
+    edge_lst_relative_off_ = (eid_t *) malloc((num_edges_) * sizeof(eid_t));
     log_info("Malloc Time (For Shrinking Graph): %.6lfs", malloc_timer.elapsed());
 
-    partition_id_lst = vector<vector<int >>(g->n);
-    bitmap_in_partition_lst = vector<vector<bmp_word_type >>(g->n);
+    partition_id_lst = vector < vector < int >> (g->n);
+    bitmap_in_partition_lst = vector < vector < bmp_word_type >> (g->n);
     log_info("Malloc Time (For BSR): %.6lfs", malloc_timer.elapsed());
 
     in_bucket_window_ = (bool *) malloc(sizeof(bool) * num_edges_);
@@ -67,7 +55,7 @@ IterHelper::IterHelper(graph_t *g, int **edge_sup_ptr, Edge **edge_lst_ptr)
 void IterHelper::MemSetIterVariables(int max_omp_threads) {
 #pragma omp single
     {
-        histogram_ = vector<uint32_t>((max_omp_threads + 1) * CACHE_LINE_ENTRY, 0);
+        histogram_ = vector<eid_t>((max_omp_threads + 1) * CACHE_LINE_ENTRY, 0);
         omp_num_threads_ = max_omp_threads;
     }
 #pragma omp for
@@ -86,16 +74,9 @@ void IterHelper::MemSetIterVariables(int max_omp_threads) {
     }
 #pragma omp for
     for (auto i = 0; i < max_omp_threads; i++) {
-        auto avg = num_edges_ / max_omp_threads;
-        auto iter_beg = avg * i;
-        auto iter_end = (i == max_omp_threads - 1) ? num_edges_ : avg * (i + 1);
-#ifndef BMP_PROCESSED
-        memset(processed_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(bool));
-#endif
-#ifndef BMP_QUEUE
-        memset(in_curr_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(bool));
-        memset(in_next_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(bool));
-#endif
+        size_t avg = num_edges_ / max_omp_threads;
+        size_t iter_beg = avg * i;
+        size_t iter_end = (i == max_omp_threads - 1) ? num_edges_ : avg * (i + 1);
         memset(in_bucket_window_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(bool));
         memset(bucket_buf_ + iter_beg, 0, (iter_end - iter_beg) * sizeof(eid_t));
 
@@ -130,7 +111,7 @@ void IterHelper::ComputeTriSupport(IterStatTLS &iter_stat_tls) {
     // Triangle-Counting With Packing Index.
     auto bool_arr = BoolArray<bmp_word_type>(g->n);
 #pragma omp for schedule(dynamic, 6000) reduction(+:tc_cnt)
-    for (auto i = 0u; i < g->m; i++)
+    for (eid_t i = 0u; i < g->m; i++)
         ComputeSupportWithPack(g, EdgeSupport, tc_cnt, i, bool_arr,
                                partition_id_lst, bitmap_in_partition_lst);
 #pragma omp single
@@ -150,8 +131,8 @@ void IterHelper::SwapCurNextQueue() {
 }
 
 void IterHelper::ShrinkCSREID(volatile eid_t *global_buffer_size, vid_t *local_buffer) {
-    LocalWriteBuffer<vid_t, eid_t> local_write_buffer(local_buffer, V_BUFF_SIZE, global_v_buffer_,
-                                                      global_buffer_size);
+    LocalWriteBuffer <vid_t, eid_t> local_write_buffer(local_buffer, V_BUFF_SIZE, global_v_buffer_,
+                                                       global_buffer_size);
 
 #pragma omp for
     for (auto u = 0; u < g->n; u++) {
@@ -187,7 +168,7 @@ void IterHelper::ShrinkCSREID(volatile eid_t *global_buffer_size, vid_t *local_b
 
 void IterHelper::CompactCSREID() {
     // also change off_end_
-    InclusivePrefixSumOMP(histogram_, compact_num_edges_ + 1, g->n, [this](uint32_t it) {
+    InclusivePrefixSumOMP(histogram_, compact_num_edges_ + 1, g->n, [this](vid_t it) {
         return off_end_[it + 1] - g->num_edges[it];
     });
     // Copy adj and eid
@@ -209,12 +190,12 @@ void IterHelper::CompactCSREID() {
 
 void IterHelper::ShrinkEdgeList() {
     // 1st: Select Edge List.
-    FlagPrefixSumOMP(histogram_, edge_lst_relative_off_, num_edges_, [this](uint32_t it) {
+    FlagPrefixSumOMP(histogram_, edge_lst_relative_off_, num_edges_, [this](eid_t it) {
         return processed_.get(it);
     });
     // Scatter edge list properties.
 #pragma omp for
-    for (auto i = 0u; i < num_edges_; i++) {
+    for (eid_t i = 0u; i < num_edges_; i++) {
         if (!processed_.get(i)) {
             auto off = i - edge_lst_relative_off_[i];
             edge_off_org_shrink_[off] = edge_off_org_[i];
@@ -241,7 +222,7 @@ void IterHelper::ShrinkEdgeList() {
     // 3rd: Update queue (in_curr_, curr_)
     in_curr_.clearWordsInParallelOMP(num_edges_);
 #pragma omp for
-    for (auto i = 0u; i < curr_tail_; i++) {
+    for (eid_t i = 0u; i < curr_tail_; i++) {
         auto org_eid = curr_[i];
         auto new_eid = org_eid - edge_lst_relative_off_[org_eid];
 
@@ -250,15 +231,15 @@ void IterHelper::ShrinkEdgeList() {
     }
 
     // 4th: Select Bucket.
-    FlagPrefixSumOMP(histogram_, bucket_relative_off_, window_bucket_buf_size_, [this](uint32_t it) {
+    FlagPrefixSumOMP(histogram_, bucket_relative_off_, window_bucket_buf_size_, [this](eid_t it) {
         return bucket_removed_indicator_.get(it) || processed_.get(bucket_buf_[it]);
     });
 #pragma omp for
-    for (auto i = 0u; i < num_edges_; i++) {
+    for (eid_t i = 0u; i < num_edges_; i++) {
         in_bucket_window_[i] = false;
     }
 #pragma omp for
-    for (auto i = 0u; i < window_bucket_buf_size_; i++) {
+    for (eid_t i = 0u; i < window_bucket_buf_size_; i++) {
         if (!bucket_removed_indicator_.get(i) && !processed_.get(bucket_buf_[i])) {
             auto off = i - bucket_relative_off_[i];
             bucket_buf_shrink_[off] = bucket_buf_[i];
@@ -266,7 +247,7 @@ void IterHelper::ShrinkEdgeList() {
     }
     auto shrink_bucket_size = window_bucket_buf_size_ - bucket_relative_off_[window_bucket_buf_size_ - 1];
 #pragma omp for
-    for (auto i = 0u; i < shrink_bucket_size; i++) {
+    for (eid_t i = 0u; i < shrink_bucket_size; i++) {
         auto org_eid = bucket_buf_shrink_[i];
         auto new_eid = org_eid - edge_lst_relative_off_[org_eid];
         bucket_buf_shrink_[i] = new_eid;
@@ -299,29 +280,20 @@ void IterHelper::SCANGraph(int level) {
     LocalWriteBuffer<eid_t, long> local_queue_buf(buff, BUFFER_SIZE, curr_, &curr_tail_);
 
     eid_t bkt_buff[BUFFER_SIZE];
-    LocalWriteBuffer<eid_t, size_t> local_bucket_buf(bkt_buff, BUFFER_SIZE, bucket_buf_, &window_bucket_buf_size_);
+    LocalWriteBuffer <eid_t, size_t> local_bucket_buf(bkt_buff, BUFFER_SIZE, bucket_buf_, &window_bucket_buf_size_);
 
     auto updater = [EdgeSupport, level, &local_queue_buf, this](eid_t i, eid_t buffer_id) {
         if (EdgeSupport[i] == level) {
             bucket_removed_indicator_.set_atomic(buffer_id);
 
             local_queue_buf.push(i);
-#ifndef BMP_QUEUE
-            in_curr_[i] = true;
-#else
             in_curr_.set_atomic(i);
-#endif
         }
     };
     auto updater_with_bkt = [EdgeSupport, level, &local_queue_buf, &local_bucket_buf, this](eid_t i) {
         if (EdgeSupport[i] == level) {
             local_queue_buf.push(i);
-
-#ifndef BMP_QUEUE
-            in_curr_[i] = true;
-#else
             in_curr_.set_atomic(i);
-#endif
         }
         if (EdgeSupport[i] > level && EdgeSupport[i] < bucket_level_end_) {
             bool get_token = __sync_bool_compare_and_swap(&in_bucket_window_[i], false, true);
@@ -342,7 +314,6 @@ void IterHelper::SCANGraph(int level) {
             window_bucket_buf_size_ = 0;
             log_info("Level: %d, bucket_level_end_: %d", level, bucket_level_end_);
         }
-#ifdef BMP_PROCESSED
 #pragma omp for schedule(dynamic, 1000)
         for (size_t word_idx = 0; word_idx < processed_.sizeOfWordsRange(num_edges_); word_idx++) {
             if (processed_.getWord(word_idx) == UINT32_MAX) {
@@ -355,15 +326,6 @@ void IterHelper::SCANGraph(int level) {
                 }
             }
         }
-#else
-#pragma omp for schedule(dynamic, 100)
-        for (auto u = 0; u < g_->n; u++) {
-            for (auto j = g_->num_edges[u]; j < off_end_[u + 1]; j++) {
-                if (u < g_->adj[j])
-                    updater_with_bkt(g_->eid[j]);
-            }
-        }
-#endif
         local_bucket_buf.submit_if_possible();
     } else {
         // TODO: Histogram to shrink (< current level). Or Remove Filtering.
@@ -400,17 +362,8 @@ void IterHelper::MarkProcessed() {
     for (long i = 0; i < curr_tail_; i++) {
         eid_t e = curr_[i];
 
-#ifndef BMP_PROCESSED
-        processed_[e] = true;
-#else
         processed_.set_atomic(e);
-#endif
-
-#ifndef BMP_QUEUE
-        in_curr_[e] = false;
-#else
         in_curr_.unset_atomic(e);
-#endif
     }
 
 #pragma omp barrier
@@ -438,13 +391,13 @@ void IterHelper::FreeBSR() {
 #pragma omp task
         {
             log_info("tid: %d, free bitmap_in_partition_lst", omp_get_thread_num());
-            vector<vector<bmp_word_type >> tmp;
+            vector <vector<bmp_word_type >> tmp;
             bitmap_in_partition_lst.swap(tmp);
         }
 #pragma omp task
         {
             log_info("tid: %d, free partition_id_lst", omp_get_thread_num());
-            vector<vector<int>> tmp;
+            vector <vector<int>> tmp;
             partition_id_lst.swap(tmp);
         }
     }
@@ -461,14 +414,6 @@ IterHelper::~IterHelper() {
     Timer free_timer;
     free(next_);
     free(curr_);
-
-#ifndef BMP_QUEUE
-    free(in_next_);
-    free(in_curr_);
-#endif
-#ifndef BMP_PROCESSED
-    free(processed_);
-#endif
 
     free(edge_offsets_level_);
     free(level_start_pos_);
@@ -521,11 +466,11 @@ void IterHelper::ProcessSupportZeros() {
 }
 
 void PKT_processSubLevel_intersection_handling_skew(graph_t *g, eid_t *curr,
-                                                    BoolArray<word_type> &InCurr,
+                                                    BoolArray <word_type> &InCurr,
                                                     long currTail, int *EdgeSupport, int level, eid_t *next,
-                                                    BoolArray<word_type> &InNext,
+                                                    BoolArray <word_type> &InNext,
                                                     long *nextTail,
-                                                    BoolArray<word_type> &processed,
+                                                    BoolArray <word_type> &processed,
                                                     Edge *edgeIdtoEdge, eid_t *off_end,
                                                     bool *is_vertex_updated, IterHelper &iter_helper
 );

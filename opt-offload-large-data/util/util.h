@@ -12,10 +12,6 @@ using namespace std;
 
 template<class T>
 std::string FormatWithCommas(T value) {
-//    std::stringstream ss;
-//    ss.imbue(std::locale(""));
-//    ss << std::fixed << value;
-//    return ss.str();
     string numWithCommas = to_string(value);
     int insertPosition = numWithCommas.length() - 3;
     while (insertPosition > 0) {
@@ -25,6 +21,13 @@ std::string FormatWithCommas(T value) {
     return numWithCommas;
 }
 
+inline void reset(std::stringstream &stream) {
+    const static std::stringstream initial;
+
+    stream.str(std::string());
+    stream.clear();
+    stream.copyfmt(initial);
+}
 
 inline void SetThreadSelfAffinity(int core_id) {
 #ifdef NOT_ENOUGH

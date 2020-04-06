@@ -28,23 +28,11 @@ vector<size_t> SupportUpdater::sup_update_num_arr;
 
 //Process a sub-level in a level using intersection based approach
 void PKT_processSubLevel_intersection_handling_skew(graph_t *g, eid_t *curr,
-#ifndef BMP_QUEUE
-        bool *InCurr,
-#else
-                                                    BoolArray<word_type> &InCurr,
-#endif
+                                                    BoolArray <word_type> &InCurr,
                                                     long currTail, int *EdgeSupport, int level, eid_t *next,
-#ifndef BMP_QUEUE
-        bool *InNext,
-#else
-                                                    BoolArray<word_type> &InNext,
-#endif
+                                                    BoolArray <word_type> &InNext,
                                                     long *nextTail,
-#ifndef BMP_PROCESSED
-        bool *processed,
-#else
-                                                    BoolArray<word_type> &processed,
-#endif
+                                                    BoolArray <word_type> &processed,
                                                     Edge *edgeIdtoEdge, eid_t *off_end,
                                                     bool *is_vertex_updated, IterHelper &iter_helper
 ) {
@@ -55,8 +43,8 @@ void PKT_processSubLevel_intersection_handling_skew(graph_t *g, eid_t *curr,
     LocalWriteBuffer<eid_t, long> local_write_buffer(buff, BUFFER_SIZE, next, nextTail);
 
     eid_t bkt_buff[BUFFER_SIZE];
-    LocalWriteBuffer<eid_t, size_t> local_bucket_buf(bkt_buff, BUFFER_SIZE, iter_helper.bucket_buf_,
-                                                     &iter_helper.window_bucket_buf_size_);
+    LocalWriteBuffer <eid_t, size_t> local_bucket_buf(bkt_buff, BUFFER_SIZE, iter_helper.bucket_buf_,
+                                                      &iter_helper.window_bucket_buf_size_);
 
     SupportUpdater sup_updater(EdgeSupport, InNext, level, local_write_buffer, local_bucket_buf,
                                iter_helper.bucket_level_end_, iter_helper.in_bucket_window_);
@@ -76,7 +64,7 @@ void PKT_processSubLevel_intersection_handling_skew(graph_t *g, eid_t *curr,
 
         eid_t off_nei_u = uStart, off_nei_v = vStart;
 
-        static thread_local vector<pair<eid_t, eid_t >> intersection_res(1024 * 1024);
+        static thread_local vector <pair<eid_t, eid_t >> intersection_res(1024 * 1024);
         size_t beg = 0;
         if (uEnd - uStart > 0 && vEnd - vStart > 0) {
             SetInterSectionLookup(g, off_nei_u, uEnd, off_nei_v, vEnd, intersection_res, beg);

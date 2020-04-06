@@ -61,7 +61,7 @@ public:
     // Yche Updated:
     void clearWordsInParallelOMP(size_t range) {
 #pragma omp for
-        for (auto word_idx = 0; word_idx < (range + wordinbits - 1) / wordinbits; word_idx++) {
+        for (size_t word_idx = 0; word_idx < (range + wordinbits - 1) / wordinbits; word_idx++) {
             setWord(word_idx, 0);
         }
     }

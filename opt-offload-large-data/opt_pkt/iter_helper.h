@@ -20,7 +20,7 @@ class IterHelper {
 public:
     size_t num_edges_;
 //private:
-    vector<uint32_t> histogram_;
+    vector <eid_t> histogram_;
     int omp_num_threads_;
     graph_t *g;
     eid_t *compact_num_edges_;
@@ -28,15 +28,10 @@ public:
     eid_t *compact_eid_;
 
     // num_edges_ is changed during the shrinking.
-
     int n_;
 
 public:
-#ifdef BMP_PROCESSED
-    BoolArray<word_type> processed_;
-#else
-    bool *processed_;
-#endif
+    BoolArray <word_type> processed_;
 
     // Origin Edge Offset.
     eid_t *edge_off_org_;
@@ -45,7 +40,7 @@ public:
     int level_size_;
 
     // Bucket Related.
-    BoolArray<word_type> bucket_removed_indicator_;
+    BoolArray <word_type> bucket_removed_indicator_;
     int bucket_level_end_ = 0;
     bool *in_bucket_window_;
     eid_t *bucket_buf_;
@@ -58,17 +53,10 @@ public:
     long next_tail_;
     eid_t *curr_;
 
-#ifdef BMP_QUEUE
-    BoolArray<word_type> in_curr_;
-#else
-    bool *in_curr_;
-#endif
+    BoolArray <word_type> in_curr_;
     eid_t *next_;
-#ifdef BMP_QUEUE
-    BoolArray<word_type> in_next_;
-#else
-    bool *in_next_;
-#endif
+    BoolArray <word_type> in_next_;
+
     // For Graph Shrink.
     bool *is_vertex_updated_;
     eid_t *off_end_;
@@ -84,12 +72,12 @@ public:
     Edge *edge_lst_shrink_;
     eid_t *bucket_buf_shrink_;
 
-    uint32_t *edge_lst_relative_off_; // // prefix-sum inclusive
-    uint32_t *bucket_relative_off_; // prefix-sum inclusive
+    eid_t *edge_lst_relative_off_; // // prefix-sum inclusive
+    eid_t *bucket_relative_off_; // prefix-sum inclusive
 public:
     // BSR.
-    vector<vector<int>> partition_id_lst;
-    vector<vector<bmp_word_type>> bitmap_in_partition_lst;
+    vector <vector<int>> partition_id_lst;
+    vector <vector<bmp_word_type>> bitmap_in_partition_lst;
 
     void FreeBSR();
 
@@ -117,29 +105,17 @@ public:
     int TrussDecompositionMergeBased();
 
     void TransferResult(eid_t *&level_start_pos, eid_t *&edge_offsets_level, eid_t *&edge_off_org,
-            int *&edge_sup, Edge *&edge_lst);
+                        int *&edge_sup, Edge *&edge_lst);
 
     ~IterHelper();
 };
 
 void TriCntDetailSubLevel(graph_t *g, eid_t *curr,
-#ifndef BMP_QUEUE
-        bool *InCurr,
-#else
-                          BoolArray<word_type> &InCurr,
-#endif
+                          BoolArray <word_type> &InCurr,
                           long currTail, int *EdgeSupport, int level, eid_t *next,
-#ifndef BMP_QUEUE
-        bool *InNext,
-#else
-                          BoolArray<word_type> &InNext,
-#endif
+                          BoolArray <word_type> &InNext,
                           long *nextTail,
-#ifdef BMP_PROCESSED
-                          BoolArray<word_type> &processed_,
-#else
-        bool *processed_,
-#endif
+                          BoolArray <word_type> &processed_,
                           Edge *edgeIdtoEdge, eid_t *off_end,
                           bool *is_vertex_updated, IterHelper &iter_helper, volatile eid_t &global_v_buff_size
 );
@@ -288,7 +264,7 @@ int AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper &
                         iter_helper.ProcessSupportZeros();
                     } else {
                         // 3.2: Real Processing (updating supports).
-                        size_t task_size = iter_helper.curr_tail_ * (size_t) (level + 1);
+                        size_t task_size = iter_helper.curr_tail_ * (size_t)(level + 1);
                         size_t left_edge_size = todo;
                         double estimated_tc_time = left_edge_size / (g->m / 2.0) * init_tc_time + penalty_tc_time;
                         double estimated_process_throughput = 2.0 * pow(10, 9);

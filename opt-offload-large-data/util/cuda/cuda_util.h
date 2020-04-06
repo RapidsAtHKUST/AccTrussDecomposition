@@ -163,7 +163,7 @@ struct ZLCUDATimer {
 private:
     uint32_t idx;                        //current start idx of the kernel interested
     std::vector <std::string> file_name;         //name of the file the kernel is invoked in
-    std::vector <std::string> host_func_name;   //name of the host function the kernel is invoked in
+    std::vector <std::string> host_func_name;   //name of the opt_pkt function the kernel is invoked in
     std::vector <std::string> kernel_name;   //name of the kernel invoked
     std::vector<float> kernel_time;              //kernel time
 

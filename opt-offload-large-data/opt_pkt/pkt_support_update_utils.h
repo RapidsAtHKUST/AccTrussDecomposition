@@ -23,14 +23,11 @@ void PKT_processSubLevel_intersection_handling_skew(
 class SupportUpdater {
     int *EdgeSupport;
 
-#ifndef BMP_QUEUE
-    bool *InNext;
-#else
-    BoolArray<word_type> *InNext;
-#endif
+    BoolArray <word_type> *InNext;
+
     int level;
     LocalWriteBuffer<eid_t, long> local_queue_buffer_;
-    LocalWriteBuffer<eid_t, size_t> local_bucket_buffer_;
+    LocalWriteBuffer <eid_t, size_t> local_bucket_buffer_;
     int bucket_level_end_;
     bool *in_bucket_window_;
 public:
@@ -39,20 +36,12 @@ public:
 #endif
 
     SupportUpdater(int *edgeSupport,
-#ifndef BMP_QUEUE
-            bool *inNext,
-#else
-                   BoolArray<word_type> &inNext,
-#endif
+                   BoolArray <word_type> &inNext,
                    int level,
                    LocalWriteBuffer<eid_t, long> local_write_buffer,
-                   LocalWriteBuffer<eid_t, size_t> local_bucket_buffer, int bucket_level_end, bool *in_bucket_window) :
+                   LocalWriteBuffer <eid_t, size_t> local_bucket_buffer, int bucket_level_end, bool *in_bucket_window) :
             EdgeSupport(edgeSupport),
-#ifndef BMP_QUEUE
-            InNext(inNext),
-#else
             InNext(&inNext),
-#endif
             level(level), local_queue_buffer_(local_write_buffer),
             local_bucket_buffer_(local_bucket_buffer), bucket_level_end_(bucket_level_end),
             in_bucket_window_(in_bucket_window) {}
@@ -82,11 +71,7 @@ private:
         int supE2 = __sync_fetch_and_sub(addr, 1);
         if (supE2 == (level + 1)) {
             local_queue_buffer_.push(updated_edge);
-#ifndef BMP_QUEUE
-            InNext[updated_edge] = true;
-#else
             InNext->set_atomic(updated_edge);
-#endif
         }
         if (supE2 <= level) {
             __sync_fetch_and_add(addr, 1);
@@ -104,31 +89,13 @@ public:
 
     //If e1, e2, e3 forms a triangle
     void PeelTriangle(eid_t e1, eid_t e2, eid_t e3,
-#ifdef BMP_PROCESSED
-                      BoolArray<word_type> &processed,
-#else
-            const bool *processed,
-#endif
-#ifndef BMP_QUEUE
-            const bool *InCurr
-#else
-                      BoolArray<word_type> &InCurr
-#endif
-    ) {
-#ifndef BMP_QUEUE
-        bool is_peel_e2 = !InCurr[e2];
-        bool is_peel_e3 = !InCurr[e3];
-#else
+                      BoolArray <word_type> &processed,
+                      BoolArray <word_type> &InCurr) {
         bool is_peel_e2 = !InCurr.get(e2);
         bool is_peel_e3 = !InCurr.get(e3);
-#endif
 
         if (is_peel_e2 || is_peel_e3) {     // Important for the WE dataset. (peel many edges in a sub-level).
-#ifndef BMP_PROCESSED
-            if ((!processed[e2]) && (!processed[e3])) {
-#else
             if ((!processed.get(e2)) && (!processed.get(e3))) {
-#endif
                 //Decrease support of both e2 and e3
                 if (is_peel_e2 && is_peel_e3) {
                     this->operator()(e2);
