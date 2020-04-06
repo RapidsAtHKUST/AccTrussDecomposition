@@ -4,8 +4,8 @@
 
 #include "libpopcnt.h"
 
-#include <util/search_util.h>
-#include <util/pretty_print.h>
+#include <util/search/search_util.h>
+#include <util/serialization/pretty_print.h>
 #include <util/timer.h>
 #include <util/lemire/EWAHBoolArray/headers/boolarray.h>
 

@@ -1,36 +1,52 @@
 #pragma once
 
-#include <sstream>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 
-#include "util/pretty_print.h"
+#include <cstring>
+#include <cstdlib>
+#include <cstdint>
+
+#include <string>
+#include <iomanip>
+#include <locale>
+#include <sstream>
+#include <memory>
+
+#include "util/log/log.h"
+#include "util/serialization/pretty_print.h"
+#include "util/timer.h"
+#include "util/util.h"
 
 template<typename T>
-vector<int32_t> core_val_histogram(int n, T &core, bool is_print = false) {
+vector <size_t> core_val_histogram(size_t n, T &core, bool is_print = false) {
     Timer histogram_timer;
     // core-value histogram
     int max_core_val = 0;
-    vector<int32_t> histogram;
+    vector <size_t> histogram;
 #pragma omp parallel
     {
 #pragma omp for reduction(max:max_core_val)
-        for (auto u = 0; u < n; u++) {
+        for (size_t u = 0; u < n; u++) {
             max_core_val = max(max_core_val, core[u]);
         }
 #pragma omp single
         {
             log_info("max value: %d", max_core_val);
-            histogram = vector<int32_t>(max_core_val + 1, 0);
+            histogram = vector<size_t>(max_core_val + 1, 0);
         }
-        vector<int32_t> local_histogram(histogram.size());
+        vector <size_t> local_histogram(histogram.size());
 
 #pragma omp for
-        for (auto u = 0; u < n; u++) {
+        for (size_t u = 0; u < n; u++) {
             auto core_val = core[u];
             local_histogram[core_val]++;
         }
 
         // local_histogram[i] is immutable here.
-        for (auto i = 0; i < local_histogram.size(); i++) {
+        for (size_t i = 0u; i < local_histogram.size(); i++) {
 #pragma omp atomic
             histogram[i] += local_histogram[i];
         }
@@ -62,12 +78,12 @@ vector<int32_t> core_val_histogram(int n, T &core, bool is_print = false) {
     auto thresh = n / 10;
     auto last = 0;
 
-    for (auto i = 0; i < histogram.size(); i++) {
+    for (size_t i = 0u; i < histogram.size(); i++) {
         if (bins[i] > 0) {
             bin_cnt++;
             acc += bins[i];
             if (acc > thresh || i == histogram.size() - 1) {
-                log_info("bin[%d - %d]: %'lld", last, i, acc);
+                log_info("bin[%d - %d]: %s", last, i, FormatWithCommas(acc).c_str());
                 last = i + 1;
                 acc = 0;
             }
@@ -76,12 +92,12 @@ vector<int32_t> core_val_histogram(int n, T &core, bool is_print = false) {
     log_info("Reversed Bins...");
     last = histogram.size() - 1;
     acc = 0;
-    for (int32_t i = histogram.size() - 1; i > -1; i--) {
+    for (size_t i = histogram.size() - 1; i > -1; i--) {
         if (bins[i] > 0) {
             bin_cnt++;
             acc += bins[i];
             if (acc > thresh || i == 0) {
-                log_info("bin[%d - %d]: %'lld", i, last, acc);
+                log_info("bin[%d - %d]: %s", i, last, FormatWithCommas(acc).c_str());
                 last = i + 1;
                 acc = 0;
             }

@@ -6,7 +6,7 @@
 #include <locale>
 #include <sstream>
 
-#include "log.h"
+#include "log/log.h"
 
 using namespace std;
 

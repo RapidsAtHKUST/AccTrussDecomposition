@@ -14,7 +14,7 @@
 #include <map>
 #include <vector>
 
-#include "../log.h"
+#include "../log/log.h"
 #include "cuda_config.h"
 
 /*---- 1. CUDA kernel check functions ----*/

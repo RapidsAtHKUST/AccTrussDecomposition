@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-#include "jetbrains_fake.h"
+#include "../jetbrains_fake.h"
 
 template<typename T>
 uint32_t LinearSearch(T *array, uint32_t offset_beg, uint32_t offset_end, T val) {

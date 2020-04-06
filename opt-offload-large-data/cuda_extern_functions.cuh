@@ -3,7 +3,7 @@
 #include <cassert>
 
 #include "util/cuda/cuda_util.h"
-#include "util/graph.h"
+#include "util/graph/graph.h"
 
 #define BITMAP_SCALE_LOG (9)
 #define BITMAP_SCALE (1<<BITMAP_SCALE_LOG)  /*#bits in the first-level bitmap indexed by 1 bit in the second-level bitmap*/

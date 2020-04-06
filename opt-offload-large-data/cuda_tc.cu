@@ -1,9 +1,9 @@
-#include "util/graph.h"
+#include "util/graph/graph.h"
 #include "util/util.h"
 #include "util/cuda/cuda_util.h"
 #include "util/cuda/primitives.cuh"
 #include "util/timer.h"
-#include "primitives.h"
+#include "util/primitives/primitives.h"
 #include "cuda_extern_functions.cuh"
 
 #define BSR_OPT

@@ -4,9 +4,9 @@
 
 #include <numeric>
 
-#include <util/pretty_print.h>
-#include <util/lemire/EWAHBoolArray/headers/boolarray.h>
-#include "local_buffer.h"
+#include "util/serialization/pretty_print.h"
+#include "util/lemire/EWAHBoolArray/headers/boolarray.h"
+#include "util/primitives/local_buffer.h"
 
 #define CACHE_LINE_ENTRY (16)
 #define BUCKET_OPT

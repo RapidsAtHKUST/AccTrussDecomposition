@@ -10,11 +10,11 @@
 #include <chrono>
 #include <fstream>
 
-#include "jetbrains_fake.h"
-#include "util.h"
-#include "log.h"
-#include "search_util.h"
-#include "../host/parallel_all_edge_cnc.h"
+#include "../jetbrains_fake.h"
+#include "../util.h"
+#include "../log/log.h"
+#include "../search/search_util.h"
+#include "../../host/parallel_all_edge_cnc.h"
 
 void free_graph(graph_t *g) {
     if (g->adj != nullptr)

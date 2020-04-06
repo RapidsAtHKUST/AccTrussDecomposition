@@ -3,8 +3,8 @@
 //
 
 #include "iter_helper.h"
-#include "local_buffer.h"
-#include "primitives.h"
+#include "util/primitives/local_buffer.h"
+#include "util/primitives/primitives.h"
 
 IterHelper::IterHelper(graph_t *g, int **edge_sup_ptr, Edge **edge_lst_ptr)
         : g(g), num_edges_(g->m / 2), n_(g->n),
@@ -189,7 +189,7 @@ void IterHelper::CompactCSREID() {
     // also change off_end_
     InclusivePrefixSumOMP(histogram_, compact_num_edges_ + 1, g->n, [this](uint32_t it) {
         return off_end_[it + 1] - g->num_edges[it];
-    }, omp_num_threads_);
+    });
     // Copy adj and eid
 #pragma omp for
     for (auto u = 0; u < g->n; u++) {
@@ -211,7 +211,7 @@ void IterHelper::ShrinkEdgeList() {
     // 1st: Select Edge List.
     FlagPrefixSumOMP(histogram_, edge_lst_relative_off_, num_edges_, [this](uint32_t it) {
         return processed_.get(it);
-    }, omp_num_threads_);
+    });
     // Scatter edge list properties.
 #pragma omp for
     for (auto i = 0u; i < num_edges_; i++) {
@@ -252,7 +252,7 @@ void IterHelper::ShrinkEdgeList() {
     // 4th: Select Bucket.
     FlagPrefixSumOMP(histogram_, bucket_relative_off_, window_bucket_buf_size_, [this](uint32_t it) {
         return bucket_removed_indicator_.get(it) || processed_.get(bucket_buf_[it]);
-    }, omp_num_threads_);
+    });
 #pragma omp for
     for (auto i = 0u; i < num_edges_; i++) {
         in_bucket_window_[i] = false;

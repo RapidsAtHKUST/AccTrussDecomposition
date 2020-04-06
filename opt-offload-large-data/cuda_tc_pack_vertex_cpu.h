@@ -4,9 +4,9 @@
 
 #include <omp.h>
 
-#include "util/graph.h"
+#include "util/graph/graph.h"
 #include "util/timer.h"
-#include "primitives.h"
+#include "util/primitives/primitives.h"
 #include "cuda_extern_functions.cuh"
 
 template<typename T, typename P, typename B>

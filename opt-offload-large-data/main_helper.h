@@ -9,14 +9,14 @@
 
 #include <omp.h>
 
-#include "util/graph.h"
-#include "util/log.h"
-#include "util/pretty_print.h"
+#include "util/graph/graph.h"
+#include "util/log/log.h"
+#include "util/serialization/pretty_print.h"
 #include "util/timer.h"
 #include "util/md5.h"
 #include "util/cuda/cuda_util.h"
 
-#include "host/histogram.h"
+#include "util/histogram.h"
 
 #include "main_helper.h"
 

@@ -5,8 +5,8 @@
 #include <cstdio>
 #include <cstring>
 
-#include "graph.h"
-#include "log.h"
+#include "graph/graph.h"
+#include "log/log.h"
 
 extern int parseLine(char *line);
 

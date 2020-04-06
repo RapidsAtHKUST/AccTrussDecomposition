@@ -58,7 +58,7 @@ endif ()
 
 set(CUDA_FAKE_JETBRAINS_IDX_FILES util/cuda/cuda_util.h cuda_fake/fake.h cuda_fake/fake_atomic.h cuda_fake/fake_math.h
         util/cuda/primitives.cuh util/cuda/cuda_config.h cuda_extern_functions.cuh main_helper.h
-        cuda_tc_pack_vertex_cpu.h primitives.h)
+        cuda_tc_pack_vertex_cpu.h util/primitives/primitives.h)
 #### CUDA Related Files
 find_package("CUDA")
 if (USER_CC_CAP)
@@ -68,6 +68,8 @@ else ()
     message("default: use CC (CUDA): 70")
     set(COMPUTE_CAP "70")
 endif ()
+
+include_directories(${CMAKE_SOURCE_DIR})
 
 if (CUDA_FOUND)
     message("--- CUDA Found, Toolkit Path: ${CUDA_TOOLKIT_ROOT_DIR}/")
@@ -84,7 +86,6 @@ if (CUDA_FOUND)
     cuda_add_compile_options("-Xcompiler ${OpenMP_CXX_FLAGS} -Xcompiler -march=native -DBMP_QUEUE=1 -DBMP_PROCESSED=1")
     cuda_add_compile_options("--expt-extended-lambda -use_fast_math") #for ModernGPU
     #    cuda_add_compile_options("-Xcompiler -DPKT_INTER=1 -Xcompiler -DSUP_STAT=1")
-    include_directories(${CMAKE_SOURCE_DIR})
 
     ######## CUDA Helper Related Build. #################
     cuda_add_library(cuda-tc cuda_tc.cu cuda_pack.cu pkt_inter_based_sup_updates.cu util/cuda/cuda_util.cu
@@ -93,8 +94,8 @@ if (CUDA_FOUND)
 
     ######## CPU Related Build. #################
     add_library(pkt-cpu host/iter_helper.cpp host/extern_variables.cpp
-            host/pkt_merge.cpp host/pkt_tri_cnt_intermediate.cpp util/search_util.cpp
-            util/graph.cpp util/stat.cpp util/log.cpp util/md5.cpp)
+            host/pkt_merge.cpp host/pkt_tri_cnt_intermediate.cpp util/search/search_util.cpp
+            util/graph/graph.cpp util/stat.cpp util/log/log.cpp util/md5.cpp)
     if (SWITCH_EDGE_NUM)
         target_compile_definitions(pkt-cpu PRIVATE SWITCH_EDGE_NUM=${SWITCH_EDGE_NUM})
         message("SWITCH_EDGE_NUM:${SWITCH_EDGE_NUM}")

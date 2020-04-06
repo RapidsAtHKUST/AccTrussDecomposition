@@ -1,8 +1,8 @@
 #pragma once
 
-#include <util/search_util.h>
-#include <util/jetbrains_fake.h>
-#include <util/graph.h>
+#include "util/search/search_util.h"
+#include "util/jetbrains_fake.h"
+#include "util/graph/graph.h"
 
 #include <x86intrin.h>
 

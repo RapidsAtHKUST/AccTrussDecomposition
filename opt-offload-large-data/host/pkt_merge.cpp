@@ -10,13 +10,13 @@
 #include <climits>
 #include <numeric>
 
-#include <util/graph.h>
-#include <util/log.h>
-#include <util/util.h>
-#include <util/timer.h>
-#include <util/stat.h>
-#include <util/lemire/EWAHBoolArray/headers/boolarray.h>
-#include "set_utils.h"
+#include "util/graph/graph.h"
+#include "util/log/log.h"
+#include "util/util.h"
+#include "util/timer.h"
+#include "util/stat.h"
+#include "util/lemire/EWAHBoolArray/headers/boolarray.h"
+#include "util/intersection/set_utils.h"
 
 #include "parallel_all_edge_cnc.h"
 #include "pkt_support_update_utils.h"
