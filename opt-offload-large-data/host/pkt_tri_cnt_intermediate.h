@@ -5,7 +5,7 @@
 #include "util/util.h"
 #include "util/timer.h"
 #include "util/stat.h"
-#include "util/lemire/EWAHBoolArray/headers/boolarray.h"
+#include "util/containers/boolarray.h"
 #include "iter_helper.h"
 
 inline int ComputeCNGallopingSingleDir(graph_t *g, uint32_t off_nei_u, uint32_t off_u_end,

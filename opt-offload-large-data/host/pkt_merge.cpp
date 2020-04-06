@@ -15,7 +15,7 @@
 #include "util/util.h"
 #include "util/timer.h"
 #include "util/stat.h"
-#include "util/lemire/EWAHBoolArray/headers/boolarray.h"
+#include "util/containers/boolarray.h"
 #include "util/intersection/set_utils.h"
 
 #include "parallel_all_edge_cnc.h"

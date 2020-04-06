@@ -508,7 +508,7 @@ private:
 /**
  * computes the logical or (union) between "n" bitmaps (referenced by a
  * pointer).
- * The answer gets written out in container. This might be faster than calling
+ * The answer gets written out in containers. This might be faster than calling
  * logicalor n-1 times.
  */
 template<class uword>

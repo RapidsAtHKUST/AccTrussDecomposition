@@ -4,15 +4,18 @@
 
 #include "libpopcnt.h"
 
-#include <util/search/search_util.h>
-#include <util/serialization/pretty_print.h>
-#include <util/timer.h>
-#include <util/lemire/EWAHBoolArray/headers/boolarray.h>
+#include "util/search/search_util.h"
+#include "util/serialization/pretty_print.h"
+#include "util/timer.h"
+#include "util/util.h"
+#include "util/containers/boolarray.h"
+#include "util/intersection/set_inter_cnt_utils.h"
+#include "util/containers/radix_hash_map.h"
 
-inline int FindSrc(graph_t *g, int u, uint32_t edge_idx) {
+inline int FindSrc(graph_t *g, int u, eid_t edge_idx) {
     if (edge_idx >= g->num_edges[u + 1]) {
         // update last_u, preferring galloping instead of binary search because not large range here
-        u = GallopingSearch(g->num_edges, static_cast<uint32_t>(u) + 1, g->n + 1, edge_idx);
+        u = GallopingSearch(g->num_edges, static_cast<uint32_t>(u) + 1, static_cast<uint32_t>(g->n + 1), edge_idx);
         // 1) first > , 2) has neighbor
         if (g->num_edges[u] > edge_idx) {
             while (g->num_edges[u] - g->num_edges[u - 1] == 0) { u--; }
@@ -38,7 +41,7 @@ void PackVertex(graph_t *g, P &partition_id_lst,
     auto pack_num_u = 0;
     for (auto off = g->num_edges[u]; off < g->num_edges[u + 1]; off++) {
         auto v = g->adj[off];
-        auto cur_blk_id = v / word_in_bits;
+        int cur_blk_id = v / word_in_bits;
         if (cur_blk_id == prev_blk_id) {
             pack_num_u++;
         } else {
@@ -52,7 +55,7 @@ void PackVertex(graph_t *g, P &partition_id_lst,
         packed_num++;
         for (auto off = g->num_edges[u]; off < g->num_edges[u + 1]; off++) {
             auto v = g->adj[off];
-            auto cur_blk_id = v / word_in_bits;
+            int cur_blk_id = v / word_in_bits;
             if (cur_blk_id == prev_blk_id) {
                 pack_num_u++;
             } else {
@@ -67,78 +70,55 @@ void PackVertex(graph_t *g, P &partition_id_lst,
 }
 
 template<typename P, typename B>
-inline int ComputeSupportWithPack(graph_t *g, int *EdgeSupport, size_t &tc_cnt, uint32_t i,
+inline int ComputeSupportWithPack(graph_t *g, int *EdgeSupport, size_t &tc_cnt, eid_t i,
                                   BoolArray<bmp_word_type> &bool_arr, P &partition_id_lst,
                                   B &bitmap_in_partition_lst) {
     static thread_local auto last_u = -1;
     static thread_local auto u = 0;
+    static thread_local auto radix_filter = RadixFilter(g);
     u = FindSrc(g, u, i);
-#ifdef RANGE_FILTERING
-    static thread_local int min_ele = -1;
-    static thread_local int max_ele = -1;
-    static thread_local int range_gap = -1;
-    constexpr uint32_t max_range_bits = 1024 * 32 * 8;
-    static thread_local auto range_idx_arr = BoolArray<bmp_word_type>(max_range_bits);
-#endif
+    auto du = g->num_edges[u + 1] - g->num_edges[u];
+    if (du == 0)return 0;
 
     if (last_u != u) {
+        // Construct our radix partitioning filter: RadixFilter.
+        radix_filter.Construct(u);
         // Clear.
         if (last_u != -1) {
             for (auto offset = g->num_edges[last_u]; offset < g->num_edges[last_u + 1]; offset++) {
                 auto v = g->adj[offset];
                 bool_arr.setWord(v / word_in_bits, 0);
             }
-#ifdef RANGE_FILTERING
-            range_idx_arr.reset();
-#endif
         }
         // Set.
-#ifdef RANGE_FILTERING
-        min_ele = g->adj[g->num_edges[u]];
-        max_ele = g->adj[g->num_edges[u + 1] - 1] + 1;
-        range_gap = (max_ele - min_ele) / max_range_bits + 1;
-#endif
         for (auto offset = g->num_edges[u]; offset < g->num_edges[u + 1]; offset++) {
             auto v = g->adj[offset];
-#ifdef RANGE_FILTERING
-            range_idx_arr.set((v - min_ele) / range_gap);
-#endif
             bool_arr.set(v);
         }
         last_u = u;
     }
 
     auto v = g->adj[i];
-    auto du = g->num_edges[u + 1] - g->num_edges[u];
     auto dv = g->num_edges[v + 1] - g->num_edges[v];
     auto local_cnt = 0;
 
+    // du > dv here.
     if (du > dv || ((du == dv) && (u < v))) {
         if (!partition_id_lst[v].empty()) {
-            for (auto wi = 0; wi < partition_id_lst[v].size(); wi++) {
+            for (auto wi = 0u; wi < partition_id_lst[v].size(); wi++) {
                 auto res = bool_arr.getWord(partition_id_lst[v][wi]) & bitmap_in_partition_lst[v][wi];
                 local_cnt += popcnt(&res, sizeof(bmp_word_type));
             }
         } else {
-#ifdef RANGE_FILTERING
-            auto off_beg = LinearSearch(g->adj, g->num_edges[v], g->num_edges[v + 1], min_ele);
-            for (auto off = off_beg; off < g->num_edges[v + 1]; off++) {
-                auto w = g->adj[off];
-                if (w >= max_ele) {
-                    break;
-                }
-                if (range_idx_arr.get((w - min_ele) / range_gap)) {
-                    if (bool_arr.get(w))
-                        local_cnt++;
-                }
-            }
-#else
             for (auto off = g->num_edges[v]; off < g->num_edges[v + 1]; off++) {
                 auto w = g->adj[off];
-                if (bool_arr.get(w))
-                    local_cnt++;
+                // random access.
+                if (radix_filter.PossibleExist(w)) {
+                    if (bool_arr.get(w)) {
+                        local_cnt++;
+                    }
+                }
             }
-#endif
         }
 
         // Symmetrically Assign.

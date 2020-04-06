@@ -16,7 +16,7 @@
 #include "util/log/log.h"
 #include "util/timer.h"
 #include "util/stat.h"
-#include "util/lemire/EWAHBoolArray/headers/boolarray.h"
+#include "util/containers/boolarray.h"
 #include "util/cuda/primitives.cuh"
 #include "util/serialization/pretty_print.h"
 #include "cuda_extern_functions.cuh"

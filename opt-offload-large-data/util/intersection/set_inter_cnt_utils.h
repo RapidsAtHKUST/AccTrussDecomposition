@@ -6,7 +6,46 @@
 
 #include <x86intrin.h>
 
-inline int SetIntersectionScalarCntDetail(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t off_nei_v, eid_t vEnd) {
+template <typename OFF>
+inline int SetInterLookup(graph_t *g, OFF off_nei_u, OFF uEnd, OFF off_nei_v, OFF vEnd) {
+    if (uEnd - off_nei_u > vEnd - off_nei_v) {
+        swap(uEnd, vEnd);
+        swap(off_nei_u, off_nei_v);
+    }
+    int cnt = 0;
+    while (true) {
+#ifdef __AVX512F__
+        off_nei_u = LinearSearchAVX512(g->adj, off_nei_u, uEnd, g->adj[off_nei_v]);
+#else
+        off_nei_u = LinearSearch(g->adj, off_nei_u, uEnd, g->adj[off_nei_v]);
+#endif
+        if (off_nei_u >= uEnd) {
+            break;
+        }
+#ifdef __AVX512F__
+        off_nei_v = GallopingSearchAVX512(g->adj, off_nei_v, vEnd, g->adj[off_nei_u]);
+#elif defined(__AVX2__) && defined(ENABLE_AVX2)
+        off_nei_v = GallopingSearchAVX2(g->adj, off_nei_v, vEnd, g->adj[off_nei_u]);
+#else
+        off_nei_v = GallopingSearch(g->adj, off_nei_v, vEnd, g->adj[off_nei_u]);
+#endif
+        if (off_nei_v >= vEnd) {
+            break;
+        }
+        if (g->adj[off_nei_u] == g->adj[off_nei_v]) {
+            cnt++;
+            ++off_nei_u;
+            ++off_nei_v;
+            if (off_nei_u >= uEnd || off_nei_v >= vEnd) {
+                break;
+            }
+        }
+    }
+    return cnt;
+}
+
+template <typename OFF>
+inline int SetIntersectionScalarCntDetail(graph_t *g, OFF off_nei_u, OFF uEnd, OFF off_nei_v, OFF vEnd) {
     int cnt = 0;
     if (off_nei_u < uEnd && off_nei_v < vEnd) {
         while (true) {
@@ -36,8 +75,9 @@ inline int SetIntersectionScalarCntDetail(graph_t *g, eid_t off_nei_u, eid_t uEn
 /*
  * Set Intersection Count Begin (SSE4) ========================================
  */
-inline int SetInterCntSSE4DetailOneFour(graph_t *g, uint32_t &off_nei_u, uint32_t uEnd,
-                                        uint32_t &off_nei_v, uint32_t vEnd) {
+template <typename OFF>
+inline int SetInterCntSSE4DetailOneFour(graph_t *g, OFF &off_nei_u, OFF uEnd,
+                                        OFF &off_nei_v, OFF vEnd) {
     int cnt = 0;
     if (off_nei_u < uEnd && off_nei_v + 3 < vEnd) {
         __m128i u_elements = _mm_set1_epi32(g->adj[off_nei_u]);
@@ -65,8 +105,9 @@ inline int SetInterCntSSE4DetailOneFour(graph_t *g, uint32_t &off_nei_u, uint32_
     return cnt;
 }
 
-inline int SetInterCntSSE4DetailTwoTwo(graph_t *g, uint32_t &off_nei_u, uint32_t uEnd,
-                                       uint32_t &off_nei_v, uint32_t vEnd) {
+template <typename OFF>
+inline int SetInterCntSSE4DetailTwoTwo(graph_t *g, OFF &off_nei_u, OFF uEnd,
+                                       OFF &off_nei_v, OFF vEnd) {
     int cnt = 0;
     constexpr int per_u_order = 0b01010000;
     constexpr int per_v_order = 0b01000100;
@@ -113,7 +154,8 @@ inline int SetInterCntSSE4DetailTwoTwo(graph_t *g, uint32_t &off_nei_u, uint32_t
     return cnt;
 }
 
-inline int SetInterCntSSE4Detail(graph_t *g, uint32_t off_nei_u, uint32_t uEnd, uint32_t off_nei_v, uint32_t vEnd) {
+template <typename OFF>
+inline int SetInterCntSSE4Detail(graph_t *g, OFF off_nei_u, OFF uEnd, OFF off_nei_v, OFF vEnd) {
     int cnt = 0;
     auto size_ratio = (vEnd - off_nei_v) / (uEnd - off_nei_u);
     if (size_ratio > 2) {
@@ -133,7 +175,8 @@ inline int SetInterCntSSE4Detail(graph_t *g, uint32_t off_nei_u, uint32_t uEnd, 
 /*
  * Set Intersection Count Begin (AVX2) ========================================
  */
-inline int SetInterCntAVX2DetailOneEight(graph_t *g, eid_t &off_nei_u, eid_t uEnd, eid_t &off_nei_v, eid_t vEnd) {
+template <typename OFF>
+inline int SetInterCntAVX2DetailOneEight(graph_t *g, OFF &off_nei_u, OFF uEnd, OFF &off_nei_v, OFF vEnd) {
     int cnt = 0;
     if (off_nei_u < uEnd && off_nei_v + 7 < vEnd) {
         __m256i u_elements = _mm256_set1_epi32(g->adj[off_nei_u]);
@@ -161,8 +204,8 @@ inline int SetInterCntAVX2DetailOneEight(graph_t *g, eid_t &off_nei_u, eid_t uEn
     return cnt;
 }
 
-
-inline int SetInterCntAVX2DetailTwoFour(graph_t *g, eid_t &off_nei_u, eid_t uEnd, eid_t &off_nei_v, eid_t vEnd) {
+template <typename OFF>
+inline int SetInterCntAVX2DetailTwoFour(graph_t *g, OFF &off_nei_u, OFF uEnd, OFF &off_nei_v, OFF vEnd) {
     int cnt = 0;
     __m256i per_u_order = _mm256_set_epi32(1, 1, 1, 1, 0, 0, 0, 0);
     __m256i per_v_order = _mm256_set_epi32(3, 2, 1, 0, 3, 2, 1, 0);
@@ -208,7 +251,8 @@ inline int SetInterCntAVX2DetailTwoFour(graph_t *g, eid_t &off_nei_u, eid_t uEnd
 }
 
 // The order of off_u and off_v in intersection_res is not important. No duplicated equals.
-inline int SetInterCntAVX2Detail(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t off_nei_v, eid_t vEnd) {
+template <typename OFF>
+inline int SetInterCntAVX2Detail(graph_t *g, OFF off_nei_u, OFF uEnd, OFF off_nei_v, OFF vEnd) {
     int cnt = 0;
     auto size_ratio = (vEnd - off_nei_v) / (uEnd - off_nei_u);
     if (size_ratio > 2) {
@@ -234,7 +278,8 @@ inline std::uint16_t operator "" _u(unsigned long long value) {
 }
 #endif
 
-inline int SetInterCntAVX512DetailOneSixteen(graph_t *g, eid_t &off_nei_u, eid_t uEnd, eid_t &off_nei_v, eid_t vEnd) {
+template <typename OFF>
+inline int SetInterCntAVX512DetailOneSixteen(graph_t *g, OFF &off_nei_u, OFF uEnd, OFF &off_nei_v, OFF vEnd) {
     int cnt = 0;
     if (off_nei_u < uEnd && off_nei_v + 15 < vEnd) {
         __m512i u_elements = _mm512_set1_epi32(g->adj[off_nei_u]);
@@ -261,7 +306,8 @@ inline int SetInterCntAVX512DetailOneSixteen(graph_t *g, eid_t &off_nei_u, eid_t
     return cnt;
 }
 
-inline int SetInterCntAVX512DetailFourFour(graph_t *g, eid_t &off_nei_u, eid_t uEnd, eid_t &off_nei_v, eid_t vEnd) {
+template <typename OFF>
+inline int SetInterCntAVX512DetailFourFour(graph_t *g, OFF &off_nei_u, OFF uEnd, OFF &off_nei_v, OFF vEnd) {
     int cnt = 0;
     __m512i st = _mm512_set_epi32(3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0);
     __m512i single_permutation = _mm512_set_epi32(3, 2, 1, 0, 3, 2, 1, 0, 3, 2, 1, 0, 3, 2, 1, 0);
@@ -306,7 +352,8 @@ inline int SetInterCntAVX512DetailFourFour(graph_t *g, eid_t &off_nei_u, eid_t u
     return cnt;
 }
 
-inline int SetIntersectionMergeAVX512Detail(graph_t *g, eid_t off_nei_u, eid_t uEnd, eid_t off_nei_v, eid_t vEnd) {
+template <typename OFF>
+inline int SetIntersectionMergeAVX512Detail(graph_t *g, OFF off_nei_u, OFF uEnd, OFF off_nei_v, OFF vEnd) {
     int cnt = 0;
     auto size1 = (vEnd - off_nei_v) / (uEnd - off_nei_u);
     if (size1 > 4) {
@@ -321,3 +368,17 @@ inline int SetIntersectionMergeAVX512Detail(graph_t *g, eid_t off_nei_u, eid_t u
 #endif
 
 #endif
+
+template <typename OFF>
+inline int SetInterCntVecMerge(graph_t *g, OFF off_nei_u, OFF uEnd, OFF off_nei_v, OFF vEnd) {
+    int cn_count = 0;
+#ifdef __AVX2__
+    cn_count = SetInterCntAVX2Detail(g, off_nei_u, uEnd, off_nei_v, vEnd);
+#elif defined(__SSE4_1__)
+    cn_count = SetInterCntSSE4Detail(g, off_nei_u, uEnd, off_nei_v, vEnd);
+#else
+    cn_count = SetIntersectionScalarCntDetail(g, off_nei_u, uEnd, off_nei_v, vEnd);
+#endif
+    return cn_count;
+}
+

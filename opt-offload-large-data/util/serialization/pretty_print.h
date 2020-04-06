@@ -84,7 +84,7 @@ namespace pretty_print {
     };
 
 
-    // Defines the delimiter values for a specific container and character type
+    // Defines the delimiter values for a specific containers and character type
 
     template<typename T, typename TChar>
     struct delimiters {
@@ -206,7 +206,7 @@ namespace pretty_print {
     }
 
 
-    // Basic is_container template; specialize to derive from std::true_type for all desired container types
+    // Basic is_container template; specialize to derive from std::true_type for all desired containers types
 
     template<typename T>
     struct is_container : public std::integral_constant<bool,
@@ -418,7 +418,7 @@ namespace pretty_print {
 
 
     // A wrapper for hash-table based containers that offer local iterators to each bucket.
-    // Usage: std::cout << bucket_print(m, 4) << std::endl;  (Prints bucket 5 of container m.)
+    // Usage: std::cout << bucket_print(m, 4) << std::endl;  (Prints bucket 5 of containers m.)
 
     template<typename T>
     struct bucket_print_wrapper {
@@ -461,7 +461,7 @@ bucket_print(const T &m, typename T::size_type n) {
 // Can we do better?
 
 namespace std {
-    // Prints a container to the stream using default delimiters
+    // Prints a containers to the stream using default delimiters
 
     template<typename T, typename TChar, typename TCharTraits>
     inline typename enable_if<::pretty_print::is_container<T>::value,

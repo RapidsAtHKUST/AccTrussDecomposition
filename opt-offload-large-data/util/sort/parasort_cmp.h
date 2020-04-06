@@ -131,7 +131,7 @@ void parasort(size_t sz, T *list, Cmp functor, unsigned np = 2, unsigned sf = 10
         threads[i] = std::thread(_sort<T, Cmp>, length, &sorted[start], functor);
     }
     for (auto &&thread : threads) thread.join();
-// Step 6: Copy the temporary container for the sorted array into the input array.    
+// Step 6: Copy the temporary containers for the sorted array into the input array.
     std::memcpy(list, &sorted[0], sz * sizeof(T));
 }
 

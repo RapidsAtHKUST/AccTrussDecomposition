@@ -3,7 +3,7 @@
 #include <new>
 #include <malloc.h>
 #include "omp.h"
-#include <util/search_util.h>
+#include "util/search/search_util.h"
 
 inline uint32_t get_log_size(int x) {
     int cnt = 0;

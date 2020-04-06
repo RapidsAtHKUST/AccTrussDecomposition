@@ -5,7 +5,7 @@
 #include <numeric>
 
 #include "util/serialization/pretty_print.h"
-#include "util/lemire/EWAHBoolArray/headers/boolarray.h"
+#include "util/containers/boolarray.h"
 #include "util/primitives/local_buffer.h"
 
 #define CACHE_LINE_ENTRY (16)
