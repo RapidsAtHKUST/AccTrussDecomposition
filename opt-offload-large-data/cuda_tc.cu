@@ -230,7 +230,7 @@ void invoke_tc_bmp_gpu(graph_t *g, int *edge_sup) {
     uint32_t *d_bitmap_states;
     InitBMP(g, d_bitmaps, d_bitmap_states, d_vertex_count, &mem_stat);
 
-    graph_t g_cuda;
+    cuda_graph_t g_cuda;
     g_cuda.n = g->n;
     g_cuda.m = g->m;
     int *edge_sup_gpu;
@@ -241,8 +241,19 @@ void invoke_tc_bmp_gpu(graph_t *g, int *edge_sup) {
     ZLCudaMalloc(&edge_sup_gpu, sizeof(int) * g_cuda.m / 2, &mem_stat);
 
     checkCudaErrors(cudaMemcpy(g_cuda.adj, g->adj, sizeof(vid_t) * g_cuda.m, cudaMemcpyHostToDevice));
-    checkCudaErrors(cudaMemcpy(g_cuda.num_edges, g->num_edges, sizeof(eid_t) * (g_cuda.n + 1), cudaMemcpyHostToDevice));
-    checkCudaErrors(cudaMemcpy(g_cuda.eid, g->eid, sizeof(eid_t) * g_cuda.m, cudaMemcpyHostToDevice));
+#pragma omp parallel
+    {
+#pragma omp for
+        for (auto i = 0; i < g_cuda.n + 1; i++) {
+            g_cuda.num_edges[i] = g->num_edges[i];
+        }
+#pragma omp for
+        for (cuda_eid_t i = 0; i < g_cuda.m; i++) {
+            g_cuda.eid[i] = g->eid[i];
+        }
+    }
+//    checkCudaErrors(cudaMemcpy(g_cuda.num_edges, g->num_edges, sizeof(eid_t) * (g_cuda.n + 1), cudaMemcpyHostToDevice));
+//    checkCudaErrors(cudaMemcpy(g_cuda.eid, g->eid, sizeof(eid_t) * g_cuda.m, cudaMemcpyHostToDevice));
     log_info("Finish BMP/CSR/eid Initialization: %.9lfs", timer.elapsed_and_reset());
 
     // 2nd: BSRs Initialization.

@@ -18,8 +18,8 @@
 using namespace std;
 
 typedef int vid_t;
-typedef unsigned int eid_t;
-//typedef size_t eid_t;
+//typedef unsigned int eid_t;
+typedef size_t eid_t;
 
 typedef struct {
     long n;
@@ -29,6 +29,16 @@ typedef struct {
     eid_t *num_edges;
     eid_t *eid;
 } graph_t;
+
+typedef struct {
+    long n;
+    long m;
+
+    vid_t *adj;
+
+    uint32_t *num_edges;
+    uint32_t *eid;
+} cuda_graph_t;
 
 //Define an Edge data type
 struct Edge {

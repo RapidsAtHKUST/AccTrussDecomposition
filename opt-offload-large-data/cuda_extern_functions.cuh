@@ -5,26 +5,16 @@
 #include "util/cuda/cuda_util.h"
 #include "util/graph/graph.h"
 
+using cuda_eid_t = uint32_t;
+
 #define BITMAP_SCALE_LOG (9)
 #define BITMAP_SCALE (1<<BITMAP_SCALE_LOG)  /*#bits in the first-level bitmap indexed by 1 bit in the second-level bitmap*/
 
 #define INT_INVALID  (INT32_MAX)
 #define LEVEL_SKIP_SIZE (16)
-//#define LEGACY_SCAN
-//#define SHRINK_ALL
+
 using bmp_word_idx_type = uint32_t;
 using bmp_word_type = uint32_t;
-
-#define INBUCKET_BOOL
-#ifndef INBUCKET_BOOL
-using InBucketWinType = int;
-#define InBucketTrue (1)
-#define InBucketFalse (0)
-#else
-using InBucketWinType = bool;
-#define InBucketTrue (true)
-#define InBucketFalse (false)
-#endif
 
 __inline__ __device__
 int get_sm_id() {
@@ -63,20 +53,22 @@ __global__ void construct_bsr_content_per_thread(uint32_t *d_offsets, int32_t *d
 __global__ void bmp_bsr_update_next(uint32_t *d_offsets, int32_t *d_dsts,
                                     uint32_t *d_bitmaps, uint32_t *d_bitmap_states,
                                     uint32_t *vertex_count, uint32_t conc_blocks_per_SM,
-                                    eid_t *eid, int32_t *d_intersection_count_GPU,
+                                    cuda_eid_t *eid, int32_t *d_intersection_count_GPU,
                                     int val_size_bitmap, int val_size_bitmap_indexes,
                                     uint32_t *bmp_offs, bmp_word_idx_type *bmp_word_indices, bmp_word_type *bmp_words,
                                     int level, int *next, int *next_cnt, bool *inNext,
-                                    InBucketWinType *in_bucket_window_, eid_t *bucket_buf_, uint32_t *window_bucket_buf_size_,
+                                    bool *in_bucket_window_, cuda_eid_t *bucket_buf_,
+                                    uint32_t *window_bucket_buf_size_,
                                     int bucket_level_end_);
 
 __global__ void bmp_update_next(uint32_t *d_offsets, int32_t *d_dsts,
                                 uint32_t *d_bitmaps, uint32_t *d_bitmap_states,
                                 uint32_t *vertex_count, uint32_t conc_blocks_per_SM,
-                                eid_t *eid, int32_t *d_intersection_count_GPU,
+                                cuda_eid_t *eid, int32_t *d_intersection_count_GPU,
                                 int val_size_bitmap, int val_size_bitmap_indexes,
                                 int level, int *next, int *next_cnt, bool *inNext,
-                                InBucketWinType *in_bucket_window_, eid_t *bucket_buf_, uint32_t *window_bucket_buf_size_,
+                                bool *in_bucket_window_, cuda_eid_t *bucket_buf_,
+                                uint32_t *window_bucket_buf_size_,
                                 int bucket_level_end_);
 
 struct CUDAContext {
@@ -126,23 +118,14 @@ int TrussDecompositionLevelsCPU(graph_t &g, int *&EdgeSupport, Edge *&edgeIdToEd
                                 eid_t *&level_start_pos, eid_t *&edge_offsets_level, eid_t *&edge_off_org,
                                 int *&edge_sup, Edge *&edge_lst);
 
-void PKT_Shrink_all(
-        graph_t &g, bool *&processed,
-        int *&EdgeSupport, eid_t *&edge_offset_origin, CUDA_Edge *&edge_list,
-        int *&new_EdgeSupport, eid_t *&new_edge_offset_origin, CUDA_Edge *&new_edge_list,
-        bool *&reversed_processed, bool *&edge_deleted, eid_t *&scanned_processed,
-        eid_t *&new_offset, eid_t *&new_eid, vid_t *&new_adj,
-        InBucketWinType *&in_bucket_window_, eid_t *&bucket_buf_, eid_t *&new_bucket_buf_, uint32_t &window_bucket_buf_size_,
-        uint32_t old_edge_num, uint32_t new_edge_num,
-        ZLCUDAMemStat *mem_stat, ZLCUDATimer *time_stat);
-
 void ShrinkCSREid(
-        graph_t &g, bool *&processed,
+        cuda_graph_t &g, bool *&processed,
         int *&EdgeSupport, eid_t *&edge_offset_origin, CUDA_Edge *&edge_list,
         int *&new_EdgeSupport, eid_t *&new_edge_offset_origin, CUDA_Edge *&new_edge_list,
-        bool *&reversed_processed, bool *&edge_deleted, eid_t *&scanned_processed,
-        eid_t *&new_offset, eid_t *&new_eid, vid_t *&new_adj,
-        InBucketWinType *&in_bucket_window_, eid_t *&bucket_buf_, eid_t *&new_bucket_buf_, uint32_t &window_bucket_buf_size_,
+        bool *&reversed_processed, bool *&edge_deleted, cuda_eid_t *&scanned_processed,
+        cuda_eid_t *&new_offset, cuda_eid_t *&new_eid, vid_t *&new_adj,
+        bool *&in_bucket_window_, cuda_eid_t *&bucket_buf_, cuda_eid_t *&new_bucket_buf_,
+        uint32_t &window_bucket_buf_size_,
         uint32_t old_edge_num, uint32_t new_edge_num,
         ZLCUDAMemStat *mem_stat, ZLCUDATimer *time_stat);
 
@@ -218,29 +201,7 @@ void init_asc(DataType *data, CntType count) {
     if (gtid < count) data[gtid] = (DataType) gtid;
 }
 
-/*check whether the CSR and edge list still match*/
-inline void check_CSR(graph_t *g, CUDA_Edge *edge_list) {
-    for (uint32_t u = 0; u < g->n; u++) {
-        auto range_start = g->num_edges[u];
-        auto range_end = g->num_edges[u + 1];
-        for (int v_idx = range_start; v_idx < range_end; v_idx++) {
-            auto v = g->adj[v_idx];
-            auto small_vertex = (u < v) ? u : v;
-            auto large_vertex = (u < v) ? v : u;
-
-            auto edge_idx = g->eid[v_idx];
-            CUDA_Edge target = edge_list[edge_idx];
-            if (target.u != small_vertex || target.v != large_vertex) {
-                log_error("CSR and edge_list do not match");
-                log_error("CSR: (%d, %d) is directed to edge_list[%d] (%d, %d).", u, v, edge_idx, target.u, target.v);
-                exit(1);
-            }
-        }
-    }
-    log_info("The CSR passes!!!");
-}
-
-inline void InitBMP(graph_t *g, uint32_t *&d_bitmaps, uint32_t *&d_bitmap_states, uint32_t *&d_vertex_count,
+inline void InitBMP(cuda_graph_t *g, uint32_t *&d_bitmaps, uint32_t *&d_bitmap_states, uint32_t *&d_vertex_count,
                     ZLCUDAMemStat *mem_stat = nullptr) {
     CUDAContext context;
     const uint32_t elem_bits = sizeof(uint32_t) * 8; /*#bits in a bitmap element*/
@@ -260,4 +221,11 @@ inline void InitBMP(graph_t *g, uint32_t *&d_bitmaps, uint32_t *&d_bitmap_states
     /*vertex count for sequential block execution*/
     ZLCudaMalloc((void **) &d_vertex_count, sizeof(uint32_t), mem_stat);
     cudaMemset(d_vertex_count, 0, sizeof(uint32_t));
+}
+
+inline void InitBMP(graph_t *g, uint32_t *&d_bitmaps, uint32_t *&d_bitmap_states, uint32_t *&d_vertex_count,
+                    ZLCUDAMemStat *mem_stat = nullptr) {
+    cuda_graph_t g2;
+    g2.n = g->n;
+    InitBMP(&g2, d_bitmaps, d_bitmap_states, d_vertex_count, mem_stat);
 }

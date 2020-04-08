@@ -5,10 +5,11 @@
 __global__ void bmp_update_next(uint32_t *d_offsets, int32_t *d_dsts,
                                 uint32_t *d_bitmaps, uint32_t *d_bitmap_states,
                                 uint32_t *vertex_count, uint32_t conc_blocks_per_SM,
-                                eid_t *eid, int32_t *d_intersection_count_GPU,
+                                cuda_eid_t *eid, int32_t *d_intersection_count_GPU,
                                 int val_size_bitmap, int val_size_bitmap_indexes,
                                 int level, int *next, int *next_cnt, bool *inNext,
-                                InBucketWinType *in_bucket_window_, eid_t *bucket_buf_, uint32_t *window_bucket_buf_size_,
+                                bool *in_bucket_window_, cuda_eid_t *bucket_buf_,
+                                uint32_t *window_bucket_buf_size_,
                                 int bucket_level_end_
 ) {
     const uint32_t tid = threadIdx.x + blockDim.x * threadIdx.y; /*threads in a warp are with continuous threadIdx.x */
@@ -90,7 +91,7 @@ __global__ void bmp_update_next(uint32_t *d_offsets, int32_t *d_dsts,
             // Update the Bucket.
             auto latest = private_count;
             if (latest > level && latest < bucket_level_end_) {
-                auto old_token = atomicCAS(in_bucket_window_ + edge_idx, InBucketFalse, InBucketTrue);
+                auto old_token = atomicCAS(in_bucket_window_ + edge_idx, false, true);
                 if (!old_token) {
                     auto insert_idx = atomicAdd(window_bucket_buf_size_, 1);
                     bucket_buf_[insert_idx] = edge_idx;
@@ -122,11 +123,12 @@ __global__ void bmp_update_next(uint32_t *d_offsets, int32_t *d_dsts,
 __global__ void bmp_bsr_update_next(uint32_t *d_offsets, int32_t *d_dsts,
                                     uint32_t *d_bitmaps, uint32_t *d_bitmap_states,
                                     uint32_t *vertex_count, uint32_t conc_blocks_per_SM,
-                                    eid_t *eid, int32_t *d_intersection_count_GPU,
+                                    cuda_eid_t *eid, int32_t *d_intersection_count_GPU,
                                     int val_size_bitmap, int val_size_bitmap_indexes,
                                     uint32_t *bmp_offs, bmp_word_idx_type *bmp_word_indices, bmp_word_type *bmp_words,
                                     int level, int *next, int *next_cnt, bool *inNext,
-                                    InBucketWinType *in_bucket_window_, eid_t *bucket_buf_, uint32_t *window_bucket_buf_size_,
+                                    bool *in_bucket_window_, cuda_eid_t *bucket_buf_,
+                                    uint32_t *window_bucket_buf_size_,
                                     int bucket_level_end_
 ) {
     const uint32_t tid = threadIdx.x + blockDim.x * threadIdx.y; /*threads in a warp are with continuous threadIdx.x */
@@ -215,7 +217,7 @@ __global__ void bmp_bsr_update_next(uint32_t *d_offsets, int32_t *d_dsts,
                 // Update the Bucket.
                 auto latest = private_count;
                 if (latest > level && latest < bucket_level_end_) {
-                    auto old_token = atomicCAS(in_bucket_window_ + edge_idx, InBucketFalse, InBucketTrue);
+                    auto old_token = atomicCAS(in_bucket_window_ + edge_idx, false, true);
                     if (!old_token) {
                         auto insert_idx = atomicAdd(window_bucket_buf_size_, 1);
                         bucket_buf_[insert_idx] = edge_idx;
