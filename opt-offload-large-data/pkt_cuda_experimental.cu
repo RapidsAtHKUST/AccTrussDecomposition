@@ -188,7 +188,7 @@ void update_processed(int *curr, uint32_t curr_cnt, bool *inCurr, bool *processe
 
 __global__
 void output_edge_support(
-        int *output, int *curr, uint32_t curr_cnt,
+        eid_t *output, int *curr, uint32_t curr_cnt,
         eid_t *edge_off_origin, eid_t start_pos) {
     auto gtid = threadIdx.x + blockIdx.x * blockDim.x;
     if (gtid < curr_cnt) {
@@ -665,7 +665,7 @@ void PrepareBucket(InBucketWinType *&in_bucket_window_,
 
 void PKT_cuda(
         graph_t *g, eid_t *edge_off_origin_cpu, int *&EdgeSupport, Edge *edgeIdToEdge, int shrink_factor,
-        int *output, eid_t *level_start_pos, ZLCUDAMemStat *mem_stat, ZLCUDATimer *time_stat, int level) {
+        eid_t *output, eid_t *level_start_pos, ZLCUDAMemStat *mem_stat, ZLCUDATimer *time_stat, int level) {
     extern double tc_time;
     Timer scan_timer, sub_process_timer, copy_timer, tc_timer, shrink_timer, prepare_timer;
     double scan_time = 0, sub_process_time = 0, copy_time = 0, shrink_time = 0, prepare_time = 0, penalty_tc_time = 0;

@@ -18,7 +18,7 @@ __global__ void bmp_kernel(uint32_t *d_offsets, /*card: |V|+1*/
                            uint32_t *d_bitmap_states, /*recording the usage of the bitmaps on the SM*/
                            uint32_t *vertex_count, /*for sequential block execution*/
                            uint32_t conc_blocks_per_SM, /*#concurrent blocks per SM*/
-                           eid_t *eid, /*card: 2*|E|*/
+                           uint32_t *eid, /*card: 2*|E|*/
                            int32_t *d_intersection_count_GPU) /*card: |E|*/
 {
     const uint32_t tid = threadIdx.x + blockDim.x * threadIdx.y; /*threads in a warp are with continuous threadIdx.x */
@@ -117,7 +117,7 @@ __global__ void bmp_bsr_kernel(uint32_t *d_offsets, /*card: |V|+1*/
                                uint32_t *d_bitmap_states, /*recording the usage of the bitmaps on the SM*/
                                uint32_t *vertex_count, /*for sequential block execution*/
                                uint32_t conc_blocks_per_SM, /*#concurrent blocks per SM*/
-                               eid_t *eid, /*card: 2*|E|*/
+                               uint32_t *eid, /*card: 2*|E|*/
                                int32_t *d_intersection_count_GPU, /*card: |E|*/
                                uint32_t *bmp_offs,
                                bmp_word_idx_type *bmp_word_indices,

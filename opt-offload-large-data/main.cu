@@ -81,13 +81,15 @@ int main(int argc, char *argv[]) {
     get_eid_timer.reset();
 
     Timer global_timer;
-    int *EdgeSupportCUDA, *output, *final_result_output;
-    ZLCudaMalloc(&output, sizeof(int) * org_num_edges, &mem_stat);
-    ZLCudaMalloc(&final_result_output, sizeof(int) * org_num_edges, &mem_stat);
+    int *EdgeSupportCUDA, *final_result_output;
+    eid_t *output;
+    ZLCudaMalloc(&output, sizeof(eid_t) * org_num_edges, &mem_stat);
+//    ZLCudaMalloc(&final_result_output, sizeof(int) * org_num_edges, &mem_stat);
+    final_result_output = (int *) malloc(sizeof(int) * org_num_edges);
     ZLCudaMalloc(&EdgeSupportCUDA, sizeof(int) * (g.m / 2), &mem_stat);
     log_info("Malloc Time: %.9lfs", global_timer.elapsed());
 
-#ifndef GPU_ONLY
+    // Truss Decomposition.
     eid_t *level_start_pos, *edge_offsets_level, *edge_off_org;
     int *edge_sup;
     Edge *edge_lst;
@@ -95,7 +97,7 @@ int main(int argc, char *argv[]) {
                                              level_start_pos, edge_offsets_level, edge_off_org,
                                              edge_sup, edge_lst);
     Timer offload_timer;
-    cudaMemcpy(output, edge_offsets_level, sizeof(int) * org_num_edges, cudaMemcpyHostToDevice);
+    cudaMemcpy(output, edge_offsets_level, sizeof(eid_t) * org_num_edges, cudaMemcpyHostToDevice);
     cudaMemcpy(EdgeSupportCUDA, edge_sup, sizeof(int) * g.m / 2, cudaMemcpyHostToDevice);
 
     assert(level_start_pos[level + 1] == 0);
@@ -104,22 +106,10 @@ int main(int argc, char *argv[]) {
              100, output, level_start_pos, &mem_stat, &time_stat, level);
     cudaDeviceSynchronize();
     log_info("Offloading Comp Time: %.9lfs", offload_timer.elapsed());
-#else
-    auto level_start_pos = (eid_t *) calloc(MAX_LEVEL, sizeof(eid_t));
-    cudaMemcpy(EdgeSupportCUDA, EdgeSupport, sizeof(int) * g.m / 2, cudaMemcpyHostToDevice);
-
-    Timer tc_timer;
-    invoke_tc_bmp_gpu(&g, EdgeSupportCUDA);
-    extern double tc_time;
-    tc_time = tc_timer.elapsed();
-    PKT_cuda(&g, nullptr, EdgeSupportCUDA, edgeIdToEdge,
-             100, output, level_start_pos, &mem_stat, &time_stat, 0);
-#endif
     log_info("Parallel K-Truss: %.9lfs", global_timer.elapsed());
 
     auto output_dir = string(argv[1]) + "/" + string("ktruss-") + algorithm_name + ".histogram";
     log_info("Output Dir: %s", output_dir.c_str());
-
 
     /*Recover the EdgeSupport for checking*/
     Timer recovery_timer;
@@ -135,7 +125,7 @@ int main(int argc, char *argv[]) {
             exit(-1);
         }
 #pragma omp for
-        for (int i = start; i < end; i++) {
+        for (eid_t i = start; i < end; i++) {
             final_result_output[output[i]] = l;
         }
     }
@@ -146,17 +136,16 @@ int main(int argc, char *argv[]) {
     //Free memory
     free_graph(&g);
     free(level_start_pos);
-#ifndef GPU_ONLY
     free(edge_offsets_level);
     free(edge_off_org);
     free(edge_sup);
     free(edge_lst);
-#endif
 
     free(edgeIdToEdge);
     free(EdgeSupport);
     ZLCudaFree(output, &mem_stat);
-    ZLCudaFree(final_result_output, &mem_stat);
+    free(final_result_output);
+//    ZLCudaFree(final_result_output, &mem_stat);
 
     log_info("Free Time: %.9lfs", recovery_timer.elapsed());
 #ifdef USE_LOG

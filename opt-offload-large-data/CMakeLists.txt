@@ -58,7 +58,7 @@ endif ()
 
 set(CUDA_FAKE_JETBRAINS_IDX_FILES util/cuda/cuda_util.h cuda_fake/fake.h cuda_fake/fake_atomic.h cuda_fake/fake_math.h
         util/cuda/primitives.cuh util/cuda/cuda_config.h cuda_extern_functions.cuh main_helper.h
-        cuda_tc_pack_vertex_cpu.h util/primitives/primitives.h)
+        util/primitives/primitives.h)
 #### CUDA Related Files
 find_package("CUDA")
 if (USER_CC_CAP)

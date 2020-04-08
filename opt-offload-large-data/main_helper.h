@@ -90,4 +90,4 @@ inline void display_stats(int *EdgeSupport, long numEdges, string output_folder)
 }
 
 void PKT_cuda(graph_t *g, eid_t *edge_off_origin_cpu, int *&EdgeSupport, Edge *edgeIdToEdge, int shrink_factor,
-              int *output, eid_t *level_start_pos, ZLCUDAMemStat *mem_stat, ZLCUDATimer *time_stat, int level);
+              eid_t *output, eid_t *level_start_pos, ZLCUDAMemStat *mem_stat, ZLCUDATimer *time_stat, int level);

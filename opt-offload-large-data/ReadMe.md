@@ -1,5 +1,14 @@
 # Parallel Truss Decomposition
 
+## Variables
+
+var | comment
+--- | ---
+level_start_pos | CSR row-ptr for the `edge_offsets_level`
+output (GPU-UM) / edge_offsets_level (host) | edge offsets 
+final_result_output | 
+
+
 ## Dependencies
 
 ```
