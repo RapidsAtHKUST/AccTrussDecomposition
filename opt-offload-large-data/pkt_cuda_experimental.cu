@@ -230,20 +230,6 @@ void warp_detect_deleted_edges(
 }
 
 __global__
-void reverse_bits(bool *boolean_input, bool *boolean_output, uint32_t cnt) {
-    auto gtid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (gtid < cnt) boolean_output[gtid] = !boolean_input[gtid];
-}
-
-__global__
-void update_eid(eid_t *eid, eid_t *scanned_processed, uint32_t cnt) {
-    auto gtid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (gtid < cnt) {
-        eid[gtid] -= scanned_processed[eid[gtid]];
-    }
-}
-
-__global__
 void filter_window(int *edge_sup, int count, InBucketWinType *in_bucket, int low, int high) {
     auto gtid = threadIdx.x + blockIdx.x * blockDim.x;
     if (gtid < count) {
@@ -290,40 +276,17 @@ void PKT_Scan(
         // Clear the bucket_removed_indicator
         bucket_level_end_ += LEVEL_SKIP_SIZE;
 
-#ifndef DEBUG_USE_CPU
         long grid_size = (edge_num + BLOCK_SIZE - 1) / BLOCK_SIZE;
         execKernel(filter_window, grid_size, BLOCK_SIZE, timer, false,
                    EdgeSupport, edge_num, in_bucket_window_, level, bucket_level_end_);
         *window_bucket_buf_size_ = CUBSelect(asc, bucket_buf_, in_bucket_window_, edge_num, timer, mem_stat);
-#else
-        auto &size = *window_bucket_buf_size_;
-        size = 0;
-        for (auto i = 0u; i < edge_num; i++) {
-            auto sup = EdgeSupport[i];
-            if (sup >= level && sup < bucket_level_end_) {
-                in_bucket_window_[i] = true;
-                bucket_buf_[size++] = i;
-            }
-        }
-#endif
     }
     // SCAN the window.
     if (*window_bucket_buf_size_ != 0) {
-#ifndef DEBUG_USE_CPU
         curr_cnt = 0;
         long grid_size = (*window_bucket_buf_size_ + BLOCK_SIZE - 1) / BLOCK_SIZE;
         execKernel(filter_with_random_append, grid_size, BLOCK_SIZE, timer, false,
                    bucket_buf_, *window_bucket_buf_size_, EdgeSupport, inCurr, curr, &curr_cnt, level);
-#else
-        curr_cnt = 0;
-        for (auto i = 0u; i < *window_bucket_buf_size_; i++) {
-            auto edge_off = bucket_buf_[i];
-            if (EdgeSupport[edge_off] == level) {
-                curr[curr_cnt++] = edge_off;
-                inCurr[edge_off] = true;
-            }
-        }
-#endif
     } else {
         curr_cnt = 0;
     }
@@ -405,11 +368,7 @@ void PKT_SubLevelTCBased(
     execKernel(update_processed, grid_size, block_size, time_stat, false, curr, curr_cnt, inCurr, processed);
 
     /* Shrink Edge Lists, CSR and update eid/edge_off_origin mappings */
-#ifdef SHRINK_ALL
-    PKT_Shrink_all(g_cuda, processed, EdgeSupport, edge_off_origin, edge_list,
-#else
     ShrinkCSREid(g_cuda, processed, EdgeSupport, edge_off_origin, edge_list,
-#endif
                  new_EdgeSupport, new_edge_offset_origin, new_edge_list,
                  reversed_processed, edge_deleted, scanned_processed,
                  new_offset, new_eid, new_adj,
@@ -504,103 +463,6 @@ void ShrinkCSREid(
     swap_ele(g.eid, new_eid);
 
     g.m = new_edge_num * 2;
-    assert(num_obj == mem_stat->get_num_obj()); //the mem object num should be the same
-}
-
-/*
- * Shrink the adj, eid, EdgeSupport and edge_list arrays
- * */
-void PKT_Shrink_all(
-        graph_t &g, bool *&processed,
-        int *&EdgeSupport, eid_t *&edge_offset_origin, CUDA_Edge *&edge_list,
-        int *&new_EdgeSupport, eid_t *&new_edge_offset_origin, CUDA_Edge *&new_edge_list,
-        bool *&reversed_processed, bool *&edge_deleted, eid_t *&scanned_processed,
-        eid_t *&new_offset, eid_t *&new_eid, vid_t *&new_adj,
-        InBucketWinType *&in_bucket_window_, eid_t *&bucket_buf_, eid_t *&new_bucket_buf_,
-        uint32_t &window_bucket_buf_size_,
-        uint32_t old_edge_num, uint32_t new_edge_num,
-        ZLCUDAMemStat *mem_stat, ZLCUDATimer *time_stat) {
-    static bool shrink_first_time = true;
-    if (shrink_first_time) { //shrink first time, allocate the buffers
-        shrink_first_time = false;
-        Timer alloc_timer;
-        ZLCudaMalloc(&new_EdgeSupport, sizeof(int) * new_edge_num, mem_stat);
-        ZLCudaMalloc(&new_edge_offset_origin, sizeof(eid_t) * new_edge_num, mem_stat);
-        ZLCudaMalloc(&new_edge_list, sizeof(CUDA_Edge) * new_edge_num, mem_stat);
-        ZLCudaMalloc(&new_offset, sizeof(eid_t) * (g.n + 1), mem_stat);
-        ZLCudaMalloc(&new_adj, sizeof(vid_t) * new_edge_num * 2, mem_stat);
-        ZLCudaMalloc(&new_eid, sizeof(eid_t) * new_edge_num * 2, mem_stat);
-        ZLCudaMalloc(&new_bucket_buf_, sizeof(eid_t) * new_edge_num, mem_stat);
-
-        ZLCudaMalloc(&reversed_processed, sizeof(bool) * old_edge_num, mem_stat);
-        ZLCudaMalloc(&edge_deleted, sizeof(bool) * old_edge_num * 2, mem_stat);
-        ZLCudaMalloc(&scanned_processed, sizeof(eid_t) * old_edge_num, mem_stat);
-        log_info("Shrink Allocation Time: %.9lfs", alloc_timer.elapsed());
-    }
-    auto num_obj = mem_stat->get_num_obj();
-
-    /*1. construct new edge list and edge support array*/
-    int grid_size_reverse_bits = (old_edge_num + BLOCK_SIZE - 1) / BLOCK_SIZE;
-    execKernel(reverse_bits, grid_size_reverse_bits, BLOCK_SIZE, time_stat, true, processed, reversed_processed,
-               old_edge_num);
-
-    /*write to new arrays*/
-    CUBSelect(EdgeSupport, new_EdgeSupport, reversed_processed, old_edge_num, time_stat, mem_stat);
-    CUBSelect(edge_offset_origin, new_edge_offset_origin, reversed_processed, old_edge_num, time_stat, mem_stat);
-    CUBSelect(edge_list, new_edge_list, reversed_processed, old_edge_num, time_stat, mem_stat);
-
-    swap_ele(EdgeSupport, new_EdgeSupport);
-    swap_ele(edge_list, new_edge_list);
-    swap_ele(edge_offset_origin, new_edge_offset_origin);
-
-    /*2. construct new CSR (offsets, adj) and rebuild the eid*/
-    int block_size = 128;
-    execKernel(warp_detect_deleted_edges, GRID_SIZE, block_size, time_stat, true, g.num_edges, g.n, g.eid, processed,
-               new_offset, edge_deleted);
-
-    eid_t total = CUBScanExclusive(new_offset, new_offset, g.n, time_stat, mem_stat);
-    new_offset[g.n] = total;
-
-    cudaDeviceSynchronize();
-    swap_ele(g.num_edges, new_offset);
-
-    /*new adj and eid construction*/
-    CUBSelect(g.adj, new_adj, edge_deleted, old_edge_num * 2, time_stat, mem_stat);
-    CUBSelect(g.eid, new_eid, edge_deleted, old_edge_num * 2, time_stat, mem_stat);
-    swap_ele(g.adj, new_adj);
-
-    CUBScanExclusive(processed, scanned_processed, old_edge_num, time_stat, mem_stat);
-
-    int grid_size_update_eid = (new_edge_num * 2 + BLOCK_SIZE - 1) / BLOCK_SIZE;
-    execKernel(update_eid, grid_size_update_eid, BLOCK_SIZE, time_stat, false, new_eid, scanned_processed,
-               new_edge_num * 2); //do the edge mapping
-    swap_ele(g.eid, new_eid);
-
-#ifndef LEGACY_SCAN
-    /* Updated: new bucket construction*/
-    if (window_bucket_buf_size_ > 0) {
-        auto grid_size = (window_bucket_buf_size_ + BLOCK_SIZE - 1) / BLOCK_SIZE;
-        execKernel(filter_not_processed, grid_size, BLOCK_SIZE, time_stat, false,
-                   bucket_buf_, window_bucket_buf_size_, reversed_processed, processed); //do the edge mapping
-        window_bucket_buf_size_ = CUBSelect(bucket_buf_, new_bucket_buf_,
-                                            reversed_processed, window_bucket_buf_size_, time_stat, mem_stat);
-
-        execKernel(update_eid, grid_size, BLOCK_SIZE, time_stat, false,
-                   new_bucket_buf_, scanned_processed, window_bucket_buf_size_); //do the edge mapping
-        swap_ele(bucket_buf_, new_bucket_buf_);
-
-        checkCudaErrors(cudaMemset(in_bucket_window_, 0, sizeof(InBucketWinType) * new_edge_num));
-        execKernel(random_access_set, grid_size, BLOCK_SIZE, time_stat, false,
-                   bucket_buf_, window_bucket_buf_size_, in_bucket_window_, InBucketTrue);
-    } else {
-        checkCudaErrors(cudaMemset(in_bucket_window_, 0, sizeof(InBucketWinType) * new_edge_num));
-    }
-#endif
-    /*3. update the processed array*/
-    checkCudaErrors(cudaMemset(processed, 0, sizeof(bool) * new_edge_num));
-
-    g.m = new_edge_num * 2;
-
     assert(num_obj == mem_stat->get_num_obj()); //the mem object num should be the same
 }
 
@@ -729,8 +591,8 @@ void PKT_cuda(
     cudaDeviceSynchronize();
 
     time_stat->reset();
-    vector<pair<int, double>> tc_stat;
-    vector<pair<int, double>> shrink_stat;
+    vector <pair<int, double>> tc_stat;
+    vector <pair<int, double>> shrink_stat;
     // Begin of Level-Processing, finding edges in k-truss but not in the (k+1)-truss.
     while (todo > 0) {
         log_trace("Level: %d, todo(origin): %d, todo(cur): %d., have: %d", level, todo_original, todo,
@@ -740,11 +602,7 @@ void PKT_cuda(
 //        if (false) { //need to shrink the graph
             shrink_timer.reset();
             shrink_kernel_timer.reset();
-#ifdef SHRINK_ALL
-            PKT_Shrink_all(g_cuda, processed,
-#else
             ShrinkCSREid(g_cuda, processed,
-#endif
                          EdgeSupport, edge_off_origin, edge_list,
                          new_EdgeSupport, new_edge_offset_origin, new_edge_list,
                          reversed_processed, edge_deleted, scanned_processed,
@@ -760,13 +618,6 @@ void PKT_cuda(
             shrink_cnt++;
             deleted_acc = 0;
 
-#ifdef SHRINK_ALL
-            ZLCudaFree(identity_arr_asc, mem_stat);
-            identity_arr_asc = nullptr;
-            ZLCudaMalloc(&identity_arr_asc, sizeof(eid_t) * edge_num, mem_stat); //now the edge_num is changed.
-            auto grid_size = (edge_num + BLOCK_SIZE - 1) / BLOCK_SIZE;
-            execKernel(init_asc, grid_size, BLOCK_SIZE, time_stat, false, identity_arr_asc, edge_num);
-#endif
             shrink_first_time = false;
             log_trace("Shrink graph finished");
         }
@@ -775,11 +626,7 @@ void PKT_cuda(
         // 2nd: Frontier Generation.
         scan_timer.reset();
         PKT_Scan(EdgeSupport,
-#ifdef SHRINK_ALL
-                edge_num,
-#else
                  todo_original,
-#endif
                  level, curr, inCurr, curr_cnt, identity_arr_asc,
                  in_bucket_window_, bucket_buf_, window_bucket_buf_size_, bucket_level_end_, mem_stat, time_stat);
         cudaDeviceSynchronize();
@@ -809,13 +656,12 @@ void PKT_cuda(
             if (level == 0) {
                 PKT_LevelZeroProcess(curr, curr_cnt, inCurr, processed, mem_stat, time_stat);
             } else {
-                size_t task_size = curr_cnt * (size_t) (level + 1);
+                size_t task_size = curr_cnt * (size_t)(level + 1);
                 size_t left_edge_size = todo;
                 double estimated_tc_time = left_edge_size / (g->m / 2.0) * tc_time + penalty_tc_time;
                 double estimated_process_throughput = 4.0 * pow(10, 9);
                 double estimated_peel_time = task_size / estimated_process_throughput;
                 if (estimated_tc_time > estimated_peel_time) {
-//                if (true) {
                     PKT_SubLevelProcess(EdgeSupport, edge_off_origin,
                                         edge_list, g_cuda.eid, edge_num, level,
                                         g_cuda.num_edges, g_cuda.adj,

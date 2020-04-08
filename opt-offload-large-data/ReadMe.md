@@ -8,6 +8,15 @@ level_start_pos | CSR row-ptr for the `edge_offsets_level`
 output (GPU-UM) / edge_offsets_level (host) | edge offsets 
 final_result_output | 
 
+## Invocation Codes
+
+```
+auto level = TrussDecompositionLevelsCPU(g, EdgeSupport, edgeIdToEdge,
+                                        level_start_pos, edge_offsets_level, edge_off_org,
+                                         edge_sup, edge_lst);
+PKT_cuda(&g, edge_off_org, EdgeSupportCUDA, edge_lst,
+         100, output, level_start_pos, &mem_stat, &time_stat, level);
+```
 
 ## Dependencies
 

@@ -25,7 +25,7 @@
 inline void CheckLevelOff(eid_t *level_start_pos) {
     auto last = MAX_LEVEL - 1;
     while (level_start_pos[last] == 0)last--;
-    vector<int32_t> histogram;
+    vector <eid_t> histogram;
     for (auto i = 1; i < last + 1; i++) {
         histogram.emplace_back(level_start_pos[i] - level_start_pos[i - 1]);
     }

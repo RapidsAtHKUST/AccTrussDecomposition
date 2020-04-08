@@ -84,7 +84,6 @@ int main(int argc, char *argv[]) {
     int *EdgeSupportCUDA, *final_result_output;
     eid_t *output;
     ZLCudaMalloc(&output, sizeof(eid_t) * org_num_edges, &mem_stat);
-//    ZLCudaMalloc(&final_result_output, sizeof(int) * org_num_edges, &mem_stat);
     final_result_output = (int *) malloc(sizeof(int) * org_num_edges);
     ZLCudaMalloc(&EdgeSupportCUDA, sizeof(int) * (g.m / 2), &mem_stat);
     log_info("Malloc Time: %.9lfs", global_timer.elapsed());
@@ -145,7 +144,6 @@ int main(int argc, char *argv[]) {
     free(EdgeSupport);
     ZLCudaFree(output, &mem_stat);
     free(final_result_output);
-//    ZLCudaFree(final_result_output, &mem_stat);
 
     log_info("Free Time: %.9lfs", recovery_timer.elapsed());
 #ifdef USE_LOG
