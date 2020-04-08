@@ -158,15 +158,16 @@ int AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper &
         // TC.
         IterStatTLS iter_stat_tls;
 
-        if (sizeof(eid_t) == sizeof(uint32_t)) {
+//        if (sizeof(eid_t) == sizeof(uint32_t)) {
+        if (iter_helper.g->m < UINT32_MAX) {
 #pragma omp single
             {
                 invoke_tc_bmp_gpu(iter_helper.g, *iter_helper.edge_sup_ptr_);
             }
+            iter_stat_tls.triTime = iter_stat_tls.local_timer.elapsed_and_reset();
         } else {
             iter_helper.ComputeTriSupport(iter_stat_tls);
         }
-        iter_stat_tls.triTime = iter_stat_tls.local_timer.elapsed_and_reset();
 #pragma omp single
         {
             extern double tc_time;
