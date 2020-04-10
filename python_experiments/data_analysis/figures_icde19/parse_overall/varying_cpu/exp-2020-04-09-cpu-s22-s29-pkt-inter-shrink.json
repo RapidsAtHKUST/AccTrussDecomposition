@@ -1,0 +1,274 @@
+{
+    "s22-16": {
+        "56": {
+            "Tri time": 4.858,
+            "Sync Time": 0.028,
+            "Shrink Time": 1.248,
+            "Scan Time": 0.667,
+            "Proc Time": 12.822,
+            "Total computation cost": 19.625,
+            "speedup": {
+                "Tri time": "1.000",
+                "Sync Time": "1.000",
+                "Shrink Time": "1.000",
+                "Scan Time": "1.000",
+                "Proc Time": "1.000",
+                "Total computation cost": "1.000"
+            }
+        },
+        "60": {
+            "Tri time": 4.723,
+            "Sync Time": 0.028,
+            "Shrink Time": 1.282,
+            "Scan Time": 0.693,
+            "Proc Time": 12.731,
+            "Total computation cost": 19.458,
+            "speedup": {
+                "Tri time": "1.029",
+                "Sync Time": "1.000",
+                "Shrink Time": "0.973",
+                "Scan Time": "0.962",
+                "Proc Time": "1.007",
+                "Total computation cost": "1.009"
+            }
+        }
+    },
+    "s23-16": {
+        "56": {
+            "Tri time": 13.183,
+            "Sync Time": 0.036,
+            "Shrink Time": 2.4,
+            "Scan Time": 1.518,
+            "Proc Time": 31.212,
+            "Total computation cost": 48.35,
+            "speedup": {
+                "Tri time": "1.000",
+                "Sync Time": "1.000",
+                "Shrink Time": "1.000",
+                "Scan Time": "1.000",
+                "Proc Time": "1.000",
+                "Total computation cost": "1.000"
+            }
+        },
+        "60": {
+            "Tri time": 12.949,
+            "Sync Time": 0.036,
+            "Shrink Time": 2.402,
+            "Scan Time": 1.38,
+            "Proc Time": 30.661,
+            "Total computation cost": 47.429,
+            "speedup": {
+                "Tri time": "1.018",
+                "Sync Time": "1.000",
+                "Shrink Time": "0.999",
+                "Scan Time": "1.100",
+                "Proc Time": "1.018",
+                "Total computation cost": "1.019"
+            }
+        }
+    },
+    "s24-16": {
+        "56": {
+            "Tri time": 39.427,
+            "Sync Time": 0.047,
+            "Shrink Time": 4.664,
+            "Scan Time": 2.942,
+            "Proc Time": 77.014,
+            "Total computation cost": 124.097,
+            "speedup": {
+                "Tri time": "1.000",
+                "Sync Time": "1.000",
+                "Shrink Time": "1.000",
+                "Scan Time": "1.000",
+                "Proc Time": "1.000",
+                "Total computation cost": "1.000"
+            }
+        },
+        "60": {
+            "Tri time": 38.804,
+            "Sync Time": 0.049,
+            "Shrink Time": 4.706,
+            "Scan Time": 2.705,
+            "Proc Time": 74.508,
+            "Total computation cost": 120.774,
+            "speedup": {
+                "Tri time": "1.016",
+                "Sync Time": "0.959",
+                "Shrink Time": "0.991",
+                "Scan Time": "1.088",
+                "Proc Time": "1.034",
+                "Total computation cost": "1.028"
+            }
+        }
+    },
+    "s25-16": {
+        "56": {
+            "Tri time": 114.385,
+            "Sync Time": 0.076,
+            "Shrink Time": 10.121,
+            "Scan Time": 5.786,
+            "Proc Time": 182.449,
+            "Total computation cost": 312.819,
+            "speedup": {
+                "Tri time": "1.000",
+                "Sync Time": "1.000",
+                "Shrink Time": "1.000",
+                "Scan Time": "1.000",
+                "Proc Time": "1.000",
+                "Total computation cost": "1.000"
+            }
+        },
+        "60": {
+            "Tri time": 113.743,
+            "Sync Time": 0.063,
+            "Shrink Time": 10.401,
+            "Scan Time": 5.778,
+            "Proc Time": 181.976,
+            "Total computation cost": 311.961,
+            "speedup": {
+                "Tri time": "1.006",
+                "Sync Time": "1.206",
+                "Shrink Time": "0.973",
+                "Scan Time": "1.001",
+                "Proc Time": "1.003",
+                "Total computation cost": "1.003"
+            }
+        }
+    },
+    "s26-16": {
+        "56": {
+            "Tri time": 292.025,
+            "Sync Time": 0.092,
+            "Shrink Time": 22.592,
+            "Scan Time": 12.08,
+            "Proc Time": 441.802,
+            "Total computation cost": 768.593,
+            "speedup": {
+                "Tri time": "1.000",
+                "Sync Time": "1.000",
+                "Shrink Time": "1.000",
+                "Scan Time": "1.000",
+                "Proc Time": "1.000",
+                "Total computation cost": "1.000"
+            }
+        },
+        "60": {
+            "Tri time": 283.124,
+            "Sync Time": 0.085,
+            "Shrink Time": 21.576,
+            "Scan Time": 11.178,
+            "Proc Time": 440.073,
+            "Total computation cost": 756.039,
+            "speedup": {
+                "Tri time": "1.031",
+                "Sync Time": "1.082",
+                "Shrink Time": "1.047",
+                "Scan Time": "1.081",
+                "Proc Time": "1.004",
+                "Total computation cost": "1.017"
+            }
+        }
+    },
+    "s27-16": {
+        "56": {
+            "Tri time": 777.25,
+            "Sync Time": 0.104,
+            "Shrink Time": 46.097,
+            "Scan Time": 23.943,
+            "Proc Time": 1034.578,
+            "Total computation cost": 1881.975,
+            "speedup": {
+                "Tri time": "1.000",
+                "Sync Time": "1.000",
+                "Shrink Time": "1.000",
+                "Scan Time": "1.000",
+                "Proc Time": "1.000",
+                "Total computation cost": "1.000"
+            }
+        },
+        "60": {
+            "Tri time": 737.04,
+            "Sync Time": 0.178,
+            "Shrink Time": 47.514,
+            "Scan Time": 23.419,
+            "Proc Time": 1019.022,
+            "Total computation cost": 1827.175,
+            "speedup": {
+                "Tri time": "1.055",
+                "Sync Time": "0.584",
+                "Shrink Time": "0.970",
+                "Scan Time": "1.022",
+                "Proc Time": "1.015",
+                "Total computation cost": "1.030"
+            }
+        }
+    },
+    "s28-16": {
+        "56": {
+            "Tri time": 2043.114,
+            "Sync Time": 0.173,
+            "Shrink Time": 88.845,
+            "Scan Time": 51.599,
+            "Proc Time": 2433.293,
+            "Total computation cost": 4617.028,
+            "speedup": {
+                "Tri time": "1.000",
+                "Sync Time": "1.000",
+                "Shrink Time": "1.000",
+                "Scan Time": "1.000",
+                "Proc Time": "1.000",
+                "Total computation cost": "1.000"
+            }
+        },
+        "60": {
+            "Tri time": 2078.828,
+            "Sync Time": 0.191,
+            "Shrink Time": 103.665,
+            "Scan Time": 47.428,
+            "Proc Time": 2404.534,
+            "Total computation cost": 4634.65,
+            "speedup": {
+                "Tri time": "0.983",
+                "Sync Time": "0.906",
+                "Shrink Time": "0.857",
+                "Scan Time": "1.088",
+                "Proc Time": "1.012",
+                "Total computation cost": "0.996"
+            }
+        }
+    },
+    "s29-16": {
+        "56": {
+            "Tri time": 5065.353,
+            "Sync Time": 0.267,
+            "Shrink Time": 200.286,
+            "Scan Time": 103.062,
+            "Proc Time": 5763.147,
+            "Total computation cost": 11132.119,
+            "speedup": {
+                "Tri time": "1.000",
+                "Sync Time": "1.000",
+                "Shrink Time": "1.000",
+                "Scan Time": "1.000",
+                "Proc Time": "1.000",
+                "Total computation cost": "1.000"
+            }
+        },
+        "60": {
+            "Tri time": 5204.121,
+            "Sync Time": 0.421,
+            "Shrink Time": 207.142,
+            "Scan Time": 98.463,
+            "Proc Time": 5809.921,
+            "Total computation cost": 11320.072,
+            "speedup": {
+                "Tri time": "0.973",
+                "Sync Time": "0.634",
+                "Shrink Time": "0.967",
+                "Scan Time": "1.047",
+                "Proc Time": "0.992",
+                "Total computation cost": "0.983"
+            }
+        }
+    }
+}
