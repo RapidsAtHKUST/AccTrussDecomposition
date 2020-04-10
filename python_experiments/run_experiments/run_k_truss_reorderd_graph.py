@@ -43,7 +43,7 @@ def run_exp(env_tag=knl_tag, with_c_group=True, data_path_tag=k_truss_exec_path_
     thread_num_lst = [56, 60] if env_tag is gpu24_tag else [40]
 
     exp_res_root_name = 'exp_results'
-    folder_name = 'exp-2020-04-04-s22-s29' + os.sep + hostname
+    folder_name = 'exp-2020-04-09-cpu-s22-s29' + os.sep + hostname
     org_order_lst = ['org']
     our_reorder_dict = {
         'ustgpu2': org_order_lst,
@@ -126,6 +126,7 @@ def run_exp(env_tag=knl_tag, with_c_group=True, data_path_tag=k_truss_exec_path_
                         p = Process(target=execute_cmd, args=(dstat_cmd,))
                         p.start()
                         my_env['OMP_NUM_THREADS'] = str(t_num)
+                        my_env['CUDA_VISIBLE_DEVICES'] = str(1)
                         tle_flag, info, correct_info = time_out_util.run_with_timeout(cmd, timeout_sec=time_out,
                                                                                       env=my_env)
                         time_out_util.kill_term_recursive(p.pid)

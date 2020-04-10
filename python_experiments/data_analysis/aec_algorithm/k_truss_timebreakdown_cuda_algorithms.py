@@ -8,10 +8,8 @@ from config import *
 from exec_utilities import exec_utils
 import json
 
-config_lst = ['exp-2020-01-09',
+config_lst = ['exp-2020-04-09-offload-s22-s28',
               [
-                  'cuda-pkt-shrink-all',
-                  'cuda-pkt-shrink-all-opt',
                   'cuda-pkt-offload',
                   'cuda-pkt-offload-opt',
               ], ['gpu24']]
@@ -28,7 +26,7 @@ def fetch_statistics(root_dir, dataset_lst, reorder_tag, t_lst, algorithm, json_
         for t_num in t_lst:
             file_path = os.sep.join([root_dir, dataset, reorder_tag, t_num, algorithm + '.log'])
             lines = get_file_lines(file_path)
-
+            print(file_path)
             my_dict[dataset][t_num] = union(parse_lines_cuda(lines, gpu_cpu_time_tag_lst),
                                             parse_lines(lines, local_tag_lst, total_time_tag, total_tag_lst))
     with open(json_file_path, 'w') as ofs:
@@ -59,7 +57,7 @@ if __name__ == '__main__':
     my_res_log_file_folder = config_lst[0]
     my_gpu_lst = config_lst[2]
     dataset_lst = load_data_sets()
-    t_num = '64'
+    t_num = '60'
     for hostname in my_gpu_lst:
         app_md_path = init_folder_md_json_file('..', hostname, user_output_md_file)
         app_md_simple_path = init_folder_md_json_file('..', hostname, user_output_md_file_simple)
@@ -77,6 +75,7 @@ if __name__ == '__main__':
                         [config_dict[exp_res_root_mount_path_tag], my_res_log_file_folder, hostname, ])
                     # dataset_lst = config_dict[data_set_lst_tag]
                     reorder_tag = 'org'
+                    # t_lst = list(map(str, config_dict[thread_num_lst_tag]))
                     t_lst = list(map(str, config_dict[thread_num_lst_tag]))
 
                     # Fetch data and parse it as a markdown file

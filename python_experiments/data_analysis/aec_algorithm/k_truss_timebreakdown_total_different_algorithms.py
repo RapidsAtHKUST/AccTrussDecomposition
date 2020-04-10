@@ -9,16 +9,16 @@ from config import *
 from exec_utilities import exec_utils
 import json
 
-user_output_md_file = '2020-01-10-CPU.md'
-config_lst = ['exp-2020-01-09', [
-    'pkt-inter-legacy',
-    'pkt-inter-handle-skew',
-    'pkt-vm',
-    'pkt-gc',
-    'pkt-es',
-    'pkt-dstcp',
-    'pkt-bmpf',
+config_lst = ['exp-2020-04-09-cpu-s22-s29', [
+    # 'pkt-inter-legacy',
+    # 'pkt-inter-handle-skew',
+    # 'pkt-vm',
+    # 'pkt-gc',
+    # 'pkt-es',
+    # 'pkt-dstcp',
+    # 'pkt-bmpf',
     'pkt-inter-shrink'], ['gpu24']]
+user_output_md_file = config_lst[0].replace('exp-', '') + '.md'
 
 
 def fetch_statistics(root_dir, dataset_lst, reorder_tag, t_lst, algorithm, json_file_path):
@@ -45,7 +45,7 @@ def generate_md(dataset_lst, json_file_path, logger, output_md_file):
         data_dict = json.load(ifs)
 
         # t_num = str(max(map(int, t_lst)))
-        t_num = str(64)
+        t_num = str(60)
         lines = [['Dataset'] + all_tag_lst, ['---' for _ in range(len(all_tag_lst) + 1)]]
 
         # Dataset -> Thread Num -> Detailed Time Info
@@ -77,9 +77,8 @@ if __name__ == '__main__':
             with open(app_md_path, 'a+') as output_md_file:
                 # Dataset -> Thread Num -> Detailed Time Info
                 config_dict = get_config_dict_via_hostname(hostname)
-                root_dir = '{}mnt/luocpu9/mnt/storage1/yche/git-repos/' \
-                           'OutOfCoreSCAN/python_experiments/exp_results/{}/{}'. \
-                    format(base_dir, 'exp-2020-01-09', 'gpu24')
+                root_dir = os.sep.join(
+                    [config_dict[exp_res_root_mount_path_tag], my_res_log_file_folder, hostname, ])
                 dataset_lst = load_data_sets()
                 reorder_tag = 'org'
                 t_lst = list(map(str, config_dict[thread_num_lst_tag]))

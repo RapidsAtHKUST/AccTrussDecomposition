@@ -6,10 +6,11 @@
     "bak2": "/mnt/storage1/yche/datasets",
     "necleus_decomp_exec_path": "/home/yche/build-necleus",
     "exp_res_root_path": "/mnt/storage1/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
-    "exp_res_root_mount_path": "/home/yche/mnt/luocpu9/mnt/storage1/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
+    "exp_res_root_mount_path": "/home/yche/mnt/gpu24/mnt/storage1/yche/git-repos/OutOfCoreSCAN/python_experiments/exp_results",
     "thread_num": 64,
     "thread num lst": [
-      64
+      56,
+      60
     ],
     "bak": [
       "snap_livejournal",
