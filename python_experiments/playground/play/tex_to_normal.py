@@ -5,6 +5,7 @@ if __name__ == '__main__':
                 replace('\end{inparaenum}', '')
             # .replace('$', '')
             for l in ifs.readlines()]
+        lines = filter(lambda l: not l.startswith('%'), lines)
         line = '\n'.join(lines)
         new_line = line.replace('\n', ' ')
         max_space_num = 5
