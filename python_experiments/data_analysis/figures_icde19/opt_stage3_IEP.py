@@ -1,3 +1,4 @@
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -85,6 +86,8 @@ def option_time_tag_wrapper(obj):
 
 
 if __name__ == '__main__':
+    matplotlib.rc('pdf', fonttype=42)
+
     for suffix in ['.pdf']:
         def draw_varying_algorithm():
             draw_bars(bar_lst_lst, bar_legend_lst, dataset_abbr_lst, 'Dataset',

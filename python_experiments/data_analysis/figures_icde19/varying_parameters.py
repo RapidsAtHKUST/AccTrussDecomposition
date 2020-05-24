@@ -1,5 +1,6 @@
 import os
 
+import matplotlib
 import matplotlib.pyplot as plt
 from data_analysis.figures_icde19.general_config import *
 import json
@@ -209,6 +210,8 @@ def varying_rs(fig_folder='../data-pdf/icde20'):
 
 
 if __name__ == '__main__':
+    matplotlib.rc('pdf', fonttype=42)
+
     varying_wpt()
     varying_ct()
     varying_rs()

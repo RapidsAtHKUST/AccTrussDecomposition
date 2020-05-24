@@ -1,5 +1,6 @@
 import os
 
+import matplotlib
 import matplotlib.pyplot as plt
 from data_analysis.figures_icde19.general_config import *
 import json
@@ -158,6 +159,8 @@ def draw_varying_e_iep(bar_lst_lst, label_lst, name, fig_folder='../data-pdf/icd
 
 
 if __name__ == '__main__':
+    matplotlib.rc('pdf', fonttype=42)
+
     bar_lst_lst = []
     # draw_varying_e_tc()
     tc_cpu_lst = get_cpu_tc_time_lst()

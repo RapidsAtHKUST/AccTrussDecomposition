@@ -1,5 +1,6 @@
 import os
 
+import matplotlib
 import matplotlib.pyplot as plt
 from data_analysis.figures_icde19.general_config import *
 from data_analysis.figures_icde19.parse_overall.parse_gpu23_pre_processing import gpu23_pp_dir
@@ -93,6 +94,8 @@ def draw_overview_elapsed_time(bar_lst_lst, name, fig_folder='../data-pdf/icde20
 
 
 if __name__ == '__main__':
+    matplotlib.rc('pdf', fonttype=42)
+
     draw_overview_elapsed_time(tw_lst_lst, 'TW')
     draw_overview_elapsed_time(we_lst_lst, 'WE')
 
