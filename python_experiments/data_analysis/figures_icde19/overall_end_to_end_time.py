@@ -87,7 +87,8 @@ bar_lst_lst = [
             get_off_iep_with_tag(off_total_tag, cuda_off_load_opt, data_set_lst))
 ]
 
-bar_legend_lst = ['H-IDX', 'H-IDX+', 'MSP', 'PKT', 'OPT-CPU', 'OPT-HPU']
+bar_legend_lst = ['\\textbf{' + name + '}' for name in
+                  ['H-IDX', 'H-IDX+', 'MSP', 'PKT', 'OPT-CPU', 'OPT-HPU']]
 dataset_abbr_lst = ['OR', 'WU', 'WB', 'WI', 'WE', 'TW']
 
 print('\n\n')
@@ -157,7 +158,9 @@ def option_time_tag_wrapper(obj):
 
 
 if __name__ == '__main__':
-    matplotlib.rc('pdf', fonttype=42)
+    # matplotlib.rc('pdf', fonttype=42)
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
 
     for suffix in ['.pdf']:
         def draw_varying_algorithm():

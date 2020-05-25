@@ -28,7 +28,8 @@ def get_input_lst_lst():
 
 bar_lst_lst = get_input_lst_lst()
 
-bar_legend_lst = ['PKT-IEP', '+PSM', '+VM', '+GC', '+ES', '+DSTCP', '+BMPF', '+IDX']
+bar_legend_lst = ['\\textbf{' + name + '}' for name in
+                  ['PKT-IEP', '+PSM', '+VM', '+GC', '+ES', '+DSTCP', '+BMPF', '+IDX']]
 dataset_abbr_lst = ['WE', 'WI', 'TW']
 
 
@@ -86,7 +87,9 @@ def option_time_tag_wrapper(obj):
 
 
 if __name__ == '__main__':
-    matplotlib.rc('pdf', fonttype=42)
+    # matplotlib.rc('pdf', fonttype=42)
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
 
     for suffix in ['.pdf']:
         def draw_varying_algorithm():

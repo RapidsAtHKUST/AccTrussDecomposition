@@ -18,9 +18,9 @@ bar_lst_lst = [
     [84.191, 43.873]
 ]
 
-bar_legend_lst = ['Support Initialization',
-                  'Triangle Peeling',
-                  'Edge Filtering']
+bar_legend_lst = ['\\textbf{' + name + '}' for name in ['Support Initialization',
+                                                        'Triangle Peeling',
+                                                        'Edge Filtering']]
 dataset_abbr_lst = ['European Web Graph', 'Twitter Graph']
 
 
@@ -76,7 +76,7 @@ def draw_bars(bar_lst_lst, legend_label_lst, x_tick_label_lst, x_label_name,
 
     # 3rd: figure properties
     fig.set_size_inches(*size_of_fig)  # set ratio
-    ncols = 2
+    ncols = 3
     plt.legend(legend_label_lst,
                prop={'size': LEGEND_SIZE, "weight": "bold"}, loc="upper left", ncol=ncols)
 
@@ -92,7 +92,9 @@ def option_time_tag_wrapper(obj):
 
 
 if __name__ == '__main__':
-    matplotlib.rc('pdf', fonttype=42)
+    # matplotlib.rc('pdf', fonttype=42)
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
 
     for suffix in ['.pdf']:
         def draw_varying_algorithm():

@@ -12,7 +12,7 @@ import json
 # figure parameters
 FIG_SIZE_MULTIPLE = (8, 4.5)
 
-label_lst = ['PP', 'SI', 'GC', 'SU', 'EF']
+label_lst = ['\\textbf{' + name + '}' for name in ['PP', 'SI', 'GC', 'SU', 'EF']]
 data_names = {
     'webgraph_twitter': 'TW',
     'webgraph_eu': 'WE'
@@ -94,7 +94,9 @@ def draw_overview_elapsed_time(bar_lst_lst, name, fig_folder='../data-pdf/icde20
 
 
 if __name__ == '__main__':
-    matplotlib.rc('pdf', fonttype=42)
+    # matplotlib.rc('pdf', fonttype=42)
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
 
     draw_overview_elapsed_time(tw_lst_lst, 'TW')
     draw_overview_elapsed_time(we_lst_lst, 'WE')

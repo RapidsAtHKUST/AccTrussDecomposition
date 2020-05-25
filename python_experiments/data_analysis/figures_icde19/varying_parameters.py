@@ -210,8 +210,9 @@ def varying_rs(fig_folder='../data-pdf/icde20'):
 
 
 if __name__ == '__main__':
-    matplotlib.rc('pdf', fonttype=42)
-
+    # matplotlib.rc('pdf', fonttype=42)
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
     varying_wpt()
     varying_ct()
     varying_rs()

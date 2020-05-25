@@ -58,10 +58,11 @@ bar_lst_lst = [
     get_off_iep_with_tag(off_gpu_iep_tag, cuda_off_load_opt, data_set_lst),
 ]
 
-bar_legend_lst = ['OPT-TC', 'OFF-TC', 'OPT-IEP', 'OFF-EIEP',
-                  'OFF-RIEP-Total',
-                  'OFF-RIEP-CPU',
-                  'OFF-RIEP-GPU']
+bar_legend_lst = ['\\textbf{' + name + '}' for name in
+                  ['OPT-TC', 'OFF-TC', 'OPT-IEP', 'OFF-EIEP',
+                   'OFF-RIEP-Total',
+                   'OFF-RIEP-CPU',
+                   'OFF-RIEP-GPU']]
 
 dataset_abbr_lst = ['WE', 'WI', 'TW']
 
@@ -127,7 +128,9 @@ def option_time_tag_wrapper(obj):
 
 
 if __name__ == '__main__':
-    matplotlib.rc('pdf', fonttype=42)
+    # matplotlib.rc('pdf', fonttype=42)
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
 
     for suffix in ['.pdf']:
         def draw_varying_algorithm():

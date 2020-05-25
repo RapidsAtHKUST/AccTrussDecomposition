@@ -159,7 +159,9 @@ def draw_varying_e_iep(bar_lst_lst, label_lst, name, fig_folder='../data-pdf/icd
 
 
 if __name__ == '__main__':
-    matplotlib.rc('pdf', fonttype=42)
+    # matplotlib.rc('pdf', fonttype=42)
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
 
     bar_lst_lst = []
     # draw_varying_e_tc()
@@ -168,14 +170,16 @@ if __name__ == '__main__':
     for x, y in zip(tc_gpu_lst, tc_cpu_lst):
         if x is not None and y is not None:
             print(y / x)
-    draw_varying_e_tc(bar_lst_lst=[tc_cpu_lst, tc_gpu_lst], label_lst=['OPT-TC', 'OFF-TC'], name='tc')
+    draw_varying_e_tc(bar_lst_lst=[tc_cpu_lst, tc_gpu_lst],
+                      label_lst=['\\textbf{' + name + '}' for name in ['OPT-TC', 'OFF-TC']], name='tc')
 
     cpu_iep_lst = get_cpu_iep_time_lst()
     gpu_iep_lst = map_zero_to_none(get_gpu_iep_time_lst())
     gpu_iep_lst_cpu_part = map_zero_to_none(get_gpu_iep_cpu_part_time_lst())
     gpu_iep_lst_gpu_part = map_zero_to_none(get_gpu_iep_gpu_part_time_lst())
     draw_varying_e_iep(bar_lst_lst=[cpu_iep_lst, gpu_iep_lst, gpu_iep_lst_cpu_part, gpu_iep_lst_gpu_part],
-                       label_lst=['OPT-IEP', 'OFF-RIEP-Total', 'OFF-RIEP-CPU', 'OFF-RIEP-GPU'],
+                       label_lst=['\\textbf{' + name + '}' for name in
+                                  ['OPT-IEP', 'OFF-RIEP-Total', 'OFF-RIEP-CPU', 'OFF-RIEP-GPU']],
                        name='iep')
 
     print(cpu_iep_lst)
