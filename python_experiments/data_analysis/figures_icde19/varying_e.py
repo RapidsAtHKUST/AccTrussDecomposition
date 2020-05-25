@@ -103,7 +103,7 @@ def draw_varying_e_tc(bar_lst_lst, label_lst, name, fig_folder='../data-pdf/icde
         tick.label.set_fontsize(TICK_SIZE)
     for tick in ax.xaxis.get_major_ticks():
         tick.label.set_fontsize(TICK_SIZE)
-    ax.set_xlabel('|E|', fontsize=LABEL_SIZE)
+    ax.set_xlabel('$|E|$', fontsize=LABEL_SIZE)
     ax.set_yscale('log')
     ax.set_ylabel("Time (seconds)", fontsize=LABEL_SIZE)
     max_val = max([max(filter(lambda v: v is not None and v != 0, lst)) for lst in bar_lst_lst])
@@ -137,7 +137,7 @@ def draw_varying_e_iep(bar_lst_lst, label_lst, name, fig_folder='../data-pdf/icd
         tick.label.set_fontsize(TICK_SIZE)
     for tick in ax.xaxis.get_major_ticks():
         tick.label.set_fontsize(TICK_SIZE)
-    ax.set_xlabel('|E|', fontsize=LABEL_SIZE)
+    ax.set_xlabel('$|E|$', fontsize=LABEL_SIZE)
     ax.set_yscale('log')
     ax.set_ylabel("Time (seconds)", fontsize=LABEL_SIZE)
     max_val = max([max(filter(lambda v: v is not None and v != 0, lst)) for lst in bar_lst_lst])

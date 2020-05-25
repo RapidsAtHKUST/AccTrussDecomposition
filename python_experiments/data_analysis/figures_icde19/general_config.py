@@ -28,6 +28,6 @@ shape_lst2 = [
     '^-.',
     '<--', '>:']
 
-LABEL_SIZE = 24
+LABEL_SIZE = 24 + 8
 TICK_SIZE = 24
 LEGEND_SIZE = 24

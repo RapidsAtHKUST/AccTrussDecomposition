@@ -31,7 +31,7 @@ def varying_wpt(fig_folder='../data-pdf/icde20'):
     # Size
     ax_time.tick_params(labelsize=TICK_SIZE)
     ax_packed_v.tick_params(labelsize=TICK_SIZE)
-    ax_time.set_xlabel('wpt', fontsize=LABEL_SIZE)
+    ax_time.set_xlabel('$wpt$', fontsize=LABEL_SIZE)
     # Log Scale
     ax_time.set_yscale('log')
     ax_packed_v.set_yscale('log')
@@ -85,7 +85,7 @@ def varying_ct(fig_folder='../data-pdf/icde20'):
     # Size
     ax_time.tick_params(labelsize=TICK_SIZE)
     ax_packed_v.tick_params(labelsize=TICK_SIZE)
-    ax_time.set_xlabel('ct', fontsize=LABEL_SIZE)
+    ax_time.set_xlabel('$ct$', fontsize=LABEL_SIZE)
     # Log Scale
     ax_time.set_yscale('log')
     ax_packed_v.set_yscale('log')
@@ -139,7 +139,7 @@ def varying_ept(fig_folder='../data-pdf/icde20'):
     # Size
     ax_time.tick_params(labelsize=TICK_SIZE)
     ax_packed_v.tick_params(labelsize=TICK_SIZE)
-    ax_time.set_xlabel('ept (base: $1.25 \cdot 10^8$)', fontsize=LABEL_SIZE)
+    ax_time.set_xlabel('$ept$ (base: $1.25 \cdot 10^8$)', fontsize=LABEL_SIZE)
     # Log Scale
     # Y-Labels
     ax_time.set_ylabel("Time (seconds)", fontsize=LABEL_SIZE)
@@ -189,7 +189,7 @@ def varying_rs(fig_folder='../data-pdf/icde20'):
 
     # Size
     ax_time.tick_params(labelsize=TICK_SIZE)
-    ax_time.set_xlabel('rs', fontsize=LABEL_SIZE)
+    ax_time.set_xlabel('$rs$', fontsize=LABEL_SIZE)
     # Log Scale
     # Y-Labels
     ax_time.set_ylabel("Time (seconds)", fontsize=LABEL_SIZE)

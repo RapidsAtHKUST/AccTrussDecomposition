@@ -7,7 +7,7 @@ from data_analysis.vis.vis_util import *
 
 FIG_SIZE_MULTIPLE = (16, 4.5)
 # FIG_SIZE_MULTIPLE = (32, 4.5)
-LABEL_SIZE = 24
+LABEL_SIZE = 24 + 8
 TICK_SIZE = 24
 LEGEND_SIZE = 24
 
